@@ -1,7 +1,7 @@
 const Cart = require('../models/cart.model');
 const Product = require('../models/product.model');
 const Order = require('../models/order.model');
-const asyncHandler = require('../utils/asyncHandler');
+const asyncHandler = require('../middleware/asyncHandler');
 const AppError = require('../utils/AppError');
 
 const ok = (res, data, msg = 'Success', code = 200) =>
