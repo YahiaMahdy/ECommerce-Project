@@ -7,15 +7,19 @@ const orderItemSchema = new mongoose.Schema(
             ref: 'Product',
             required: [true, 'Product is required'],
         },
+        name: {
+            type: String,
+            required: [true, 'name is required'],
+        },
         quantity: {
             type: Number,
             required: [true, 'Quantity is required'],
             min: [1, 'Quantity must be at least 1'],
         },
-        unitPrice: {
+        price: {
             type: Number,
-            required: [true, 'unitPrice is required'],
-            min: [0, 'unitPrice cannot be negative'],
+            required: [true, 'price is required'],
+            min: [0, 'price cannot be negative'],
         },
     },
     { _id: false }
@@ -23,9 +27,20 @@ const orderItemSchema = new mongoose.Schema(
 
 const orderSchema = new mongoose.Schema(
     {
+        orderNumber: {
+            type: String,
+            unique: true,
+        },
+
         customerName: {
             type: String,
             required: [true, 'customerName is required'],
+            trim: true,
+        },
+
+        shippingAddress: {
+            type: String,
+            required: [true, 'shippingAddress is required'],
             trim: true,
         },
 
@@ -52,5 +67,15 @@ const orderSchema = new mongoose.Schema(
     },
     { timestamps: true }
 );
+
+// Auto-generate a human-readable order number before validation runs,
+// so callers don't need to supply one manually.
+orderSchema.pre('validate', function generateOrderNumber() {
+    if (!this.orderNumber) {
+        const datePart = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+        const randomPart = Math.floor(1000 + Math.random() * 9000);
+        this.orderNumber = `ORD-${datePart}-${randomPart}`;
+    }
+});
 
 module.exports = mongoose.model('Order', orderSchema);

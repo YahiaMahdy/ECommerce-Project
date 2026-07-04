@@ -13,10 +13,10 @@ const cartItemSchema = new mongoose.Schema(
             min: [1, 'Quantity must be at least 1'],
             default: 1,
         },
-        unitPrice: {
+        price: {
             type: Number,
-            required: [true, 'unitPrice is required'],
-            min: [0, 'unitPrice cannot be negative'],
+            required: [true, 'price is required'],
+            min: [0, 'price cannot be negative'],
         },
     },
     { _id: false }

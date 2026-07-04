@@ -57,9 +57,24 @@ const products = [
         price: 12,
         stock: 75,
     },
+    {
+        name: 'Blender',
+        category: 'kitchen',
+        price: 89,
+        stock: 20,
+    },
+    {
+        name: 'Bookshelf',
+        category: 'furniture',
+        price: 179,
+        stock: 10,
+    },
 ];
 
 const seed = async () => {
+    let categoryCount = 0;
+    let productCount = 0;
+
     try {
         await connectDB();
         await Order.deleteMany();
@@ -79,11 +94,13 @@ const seed = async () => {
 
         const createdProducts = await Product.insertMany(productsWithCategoryIds);
 
-        console.log(`Seeded ${createdCategories.length} categories.`);
-        console.log(`Seeded ${createdProducts.length} products.`);
+        categoryCount = createdCategories.length;
+        productCount = createdProducts.length;
     } catch (err) {
         console.error('Seed failed:', err);
     } finally {
+        console.log(`Seeded ${categoryCount} categories.`);
+        console.log(`Seeded ${productCount} products.`);
         await mongoose.disconnect();
         process.exit(0);
     }

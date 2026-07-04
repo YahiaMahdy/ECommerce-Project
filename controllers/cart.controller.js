@@ -1,6 +1,5 @@
 const Cart = require('../models/cart.model');
 const Product = require('../models/product.model');
-const Order = require('../models/order.model');
 const asyncHandler = require('../middleware/asyncHandler');
 const AppError = require('../utils/AppError');
 
@@ -15,7 +14,7 @@ const populateCart = (query) =>
     query.populate('items.product', 'name price stock category');
 
 const recalculateTotal = (items) =>
-    items.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0);
+    items.reduce((sum, item) => sum + item.quantity * item.price, 0);
 
 exports.getCarts = asyncHandler(async (req, res) => {
     const carts = await populateCart(Cart.find().sort({ createdAt: -1 }));
@@ -53,10 +52,16 @@ exports.createCart = asyncHandler(async (req, res, next) => {
                 return next(new AppError('Quantity must be at least 1', 400));
             }
 
+            if (item.quantity > product.stock) {
+                return next(
+                    new AppError(`Only ${product.stock} left in stock for ${product.name}`, 400)
+                );
+            }
+
             cartItems.push({
                 product: product._id,
                 quantity: item.quantity,
-                unitPrice: product.price,
+                price: product.price,
             });
         }
     }
@@ -101,13 +106,21 @@ exports.addItemToCart = asyncHandler(async (req, res, next) => {
         (item) => String(item.product) === String(productId)
     );
 
+    const desiredQuantity = existingItem ? existingItem.quantity + quantity : quantity;
+
+    if (desiredQuantity > product.stock) {
+        return next(
+            new AppError(`Only ${product.stock} left in stock for ${product.name}`, 400)
+        );
+    }
+
     if (existingItem) {
-        existingItem.quantity += quantity;
+        existingItem.quantity = desiredQuantity;
     } else {
         cart.items.push({
             product: product._id,
             quantity,
-            unitPrice: product.price,
+            price: product.price,
         });
     }
 
@@ -145,6 +158,13 @@ exports.updateCartItemQuantity = asyncHandler(async (req, res, next) => {
 
     if (!item) {
         return next(new AppError('Cart item not found', 404));
+    }
+
+    const product = await Product.findById(productId);
+    if (product && quantity > product.stock) {
+        return next(
+            new AppError(`Only ${product.stock} left in stock for ${product.name}`, 400)
+        );
     }
 
     item.quantity = quantity;
@@ -215,40 +235,4 @@ exports.updateCartStatus = asyncHandler(async (req, res, next) => {
     }
 
     ok(res, cart, 'Cart status updated successfully');
-});
-
-exports.checkoutCart = asyncHandler(async (req, res, next) => {
-    const cart = await populateCart(Cart.findById(req.params.id));
-
-    if (!cart) {
-        return next(new AppError('Cart not found', 404));
-    }
-
-    if (cart.items.length === 0) {
-        return next(new AppError('Cart is empty', 400));
-    }
-
-    if (cart.status !== 'active') {
-        return next(new AppError('Only active carts can be checked out', 400));
-    }
-
-    const orderItems = cart.items.map((item) => ({
-        product: item.product._id,
-        quantity: item.quantity,
-        unitPrice: item.unitPrice,
-    }));
-
-    const orderTotal = recalculateTotal(cart.items);
-
-    const order = await Order.create({
-        customerName: cart.customerName,
-        items: orderItems,
-        totalPrice: orderTotal,
-        status: 'pending',
-    });
-
-    cart.status = 'checked_out';
-    await cart.save();
-
-    ok(res, order, 'Cart checked out successfully', 201);
 });
