@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const orderItemSchema = new mongoose.Schema(
+const cartItemSchema = new mongoose.Schema(
     {
         product: {
             type: mongoose.Schema.Types.ObjectId,
@@ -11,6 +11,7 @@ const orderItemSchema = new mongoose.Schema(
             type: Number,
             required: [true, 'Quantity is required'],
             min: [1, 'Quantity must be at least 1'],
+            default: 1,
         },
         unitPrice: {
             type: Number,
@@ -21,7 +22,7 @@ const orderItemSchema = new mongoose.Schema(
     { _id: false }
 );
 
-const orderSchema = new mongoose.Schema(
+const cartSchema = new mongoose.Schema(
     {
         customerName: {
             type: String,
@@ -30,27 +31,26 @@ const orderSchema = new mongoose.Schema(
         },
 
         items: {
-            type: [orderItemSchema],
-            required: [true, 'Items are required'],
+            type: [cartItemSchema],
+            default: [],
             validate: {
-                validator: (items) => items.length > 0,
-                message: 'Order must contain at least one item.',
+                validator: (items) => items.length >= 0,
             },
         },
 
         totalPrice: {
             type: Number,
-            required: [true, 'Total price is required'],
+            default: 0,
             min: [0, 'Total price cannot be negative'],
         },
 
         status: {
             type: String,
-            enum: ['pending', 'confirmed', 'delivered'],
-            default: 'pending',
+            enum: ['active', 'checked_out', 'abandoned'],
+            default: 'active',
         },
     },
     { timestamps: true }
 );
 
-module.exports = mongoose.model('Order', orderSchema);
+module.exports = mongoose.model('Cart', cartSchema);

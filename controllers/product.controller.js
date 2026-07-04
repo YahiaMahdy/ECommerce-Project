@@ -22,13 +22,18 @@ exports.getProducts = asyncHandler(async (req, res) => {
         filter.price = { $lte: Number(maxPrice) };
     }
 
-    const products = await Product.find(filter).sort({ createdAt: -1 }).select('-__v');
+    const products = await Product.find(filter)
+        .populate('category', 'name description')
+        .sort({ createdAt: -1 })
+        .select('-__v');
 
     ok(res, products, 'Products fetched successfully');
 });
 
 exports.getProductById = asyncHandler(async (req, res, next) => {
-    const product = await Product.findById(req.params.id).select('-__v');
+    const product = await Product.findById(req.params.id)
+        .populate('category', 'name description')
+        .select('-__v');
 
     if (!product) {
         return next(new AppError('Product not found', 404));
