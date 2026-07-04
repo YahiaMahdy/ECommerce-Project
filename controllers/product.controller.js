@@ -1,4 +1,5 @@
 const Product = require('../models/product.model');
+const Category = require('../models/category.model');
 const asyncHandler = require('../middleware/asyncHandler');
 const AppError = require('../utils/AppError');
 
