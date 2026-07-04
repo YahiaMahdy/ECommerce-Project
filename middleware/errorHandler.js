@@ -1,22 +1,37 @@
+const config = require("../config/config");
+
 const errorHandler = (err, req, res, next) => {
-    console.error(`[${new Date().toISOString()}] ERROR:`, {
-        message: err.message,
-        stack: err.stack,
-        path: req.path,
-        method: req.method,
-    });
+    let statusCode = err.statusCode || 500;
+    let message = err.message || "Internal Server Error";
 
-    const statusCode = err.statusCode || 500;
-    const status = err.status || 'error';
-    const clientMessage = err.isOperational
-        ? err.message
-        : 'Something went wrong. Please try again.';
+    if (err.name === "ValidationError") {
+        statusCode = 400;
+        const firstMsg = Object.values(err.errors)[0].message;
+        message = `Validation failed: ${firstMsg}`;
+    }
 
-    const body = { status, statusCode, message: clientMessage, data: null };
+    if (err.name === "CastError") {
+        statusCode = 400;
+        message = `Invalid _id: ${err.value}`;
+    }
 
-    if (process.env.NODE_ENV === 'development') body.stack = err.stack;
+    if (err.code === 11000) {
+        statusCode = 409;
+        const field = Object.keys(err.keyValue)[0];
+        message = `${field} already exists`;
+    }
 
-    res.status(statusCode).json(body);
+    const response = {
+        status: statusCode < 500 ? "fail" : "error",
+        statusCode,
+        message,
+    };
+
+    if (config.isDev) {
+        response.stack = err.stack;
+    }
+
+    res.status(statusCode).json(response);
 };
 
 module.exports = errorHandler;
