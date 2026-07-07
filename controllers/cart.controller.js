@@ -16,8 +16,13 @@ const populateCart = (query) =>
 const recalculateTotal = (items) =>
     items.reduce((sum, item) => sum + item.quantity * item.price, 0);
 
+const canAccessCart = (cart, user) =>
+    user.role === 'admin' || String(cart.user) === String(user._id);
+
 exports.getCarts = asyncHandler(async (req, res) => {
-    const carts = await populateCart(Cart.find().sort({ createdAt: -1 }));
+    const filter = req.user.role === 'admin' ? {} : { user: req.user._id };
+
+    const carts = await populateCart(Cart.find(filter).sort({ createdAt: -1 }));
     ok(res, carts, 'Carts fetched successfully');
 });
 
@@ -28,15 +33,17 @@ exports.getCartById = asyncHandler(async (req, res, next) => {
         return next(new AppError('Cart not found', 404));
     }
 
+    if (!canAccessCart(cart, req.user)) {
+        return next(
+            new AppError('Forbidden: this cart does not belong to you', 403)
+        );
+    }
+
     ok(res, cart, 'Cart fetched successfully');
 });
 
 exports.createCart = asyncHandler(async (req, res, next) => {
-    const { customerName, items = [] } = req.body;
-
-    if (!customerName) {
-        return next(new AppError('customerName is required', 400));
-    }
+    const { items = [] } = req.body;
 
     const cartItems = [];
 
@@ -69,7 +76,8 @@ exports.createCart = asyncHandler(async (req, res, next) => {
     const totalPrice = recalculateTotal(cartItems);
 
     const cart = await Cart.create({
-        customerName,
+        user: req.user._id,
+        customerName: req.user.name,
         items: cartItems,
         totalPrice,
     });
@@ -91,6 +99,12 @@ exports.addItemToCart = asyncHandler(async (req, res, next) => {
     const cart = await Cart.findById(req.params.id);
     if (!cart) {
         return next(new AppError('Cart not found', 404));
+    }
+
+    if (!canAccessCart(cart, req.user)) {
+        return next(
+            new AppError('Forbidden: this cart does not belong to you', 403)
+        );
     }
 
     if (cart.status !== 'active') {
@@ -148,6 +162,12 @@ exports.updateCartItemQuantity = asyncHandler(async (req, res, next) => {
         return next(new AppError('Cart not found', 404));
     }
 
+    if (!canAccessCart(cart, req.user)) {
+        return next(
+            new AppError('Forbidden: this cart does not belong to you', 403)
+        );
+    }
+
     if (cart.status !== 'active') {
         return next(new AppError('Only active carts can be modified', 400));
     }
@@ -184,6 +204,12 @@ exports.removeCartItem = asyncHandler(async (req, res, next) => {
         return next(new AppError('Cart not found', 404));
     }
 
+    if (!canAccessCart(cart, req.user)) {
+        return next(
+            new AppError('Forbidden: this cart does not belong to you', 403)
+        );
+    }
+
     if (cart.status !== 'active') {
         return next(new AppError('Only active carts can be modified', 400));
     }
@@ -210,6 +236,12 @@ exports.clearCart = asyncHandler(async (req, res, next) => {
         return next(new AppError('Cart not found', 404));
     }
 
+    if (!canAccessCart(cart, req.user)) {
+        return next(
+            new AppError('Forbidden: this cart does not belong to you', 403)
+        );
+    }
+
     if (cart.status !== 'active') {
         return next(new AppError('Only active carts can be modified', 400));
     }
@@ -224,15 +256,20 @@ exports.clearCart = asyncHandler(async (req, res, next) => {
 exports.updateCartStatus = asyncHandler(async (req, res, next) => {
     const { status } = req.body;
 
-    const cart = await Cart.findByIdAndUpdate(
-        req.params.id,
-        { $set: { status } },
-        { new: true, runValidators: true }
-    );
+    const cart = await Cart.findById(req.params.id);
 
     if (!cart) {
         return next(new AppError('Cart not found', 404));
     }
+
+    if (!canAccessCart(cart, req.user)) {
+        return next(
+            new AppError('Forbidden: this cart does not belong to you', 403)
+        );
+    }
+
+    cart.status = status;
+    await cart.save({ validateModifiedOnly: true });
 
     ok(res, cart, 'Cart status updated successfully');
 });

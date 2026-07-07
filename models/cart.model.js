@@ -24,12 +24,17 @@ const cartItemSchema = new mongoose.Schema(
 
 const cartSchema = new mongoose.Schema(
     {
+        user: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User',
+            required: [true, 'user is required'],
+            index: true,
+        },
         customerName: {
             type: String,
             required: [true, 'customerName is required'],
             trim: true,
         },
-
         items: {
             type: [cartItemSchema],
             default: [],
@@ -37,13 +42,11 @@ const cartSchema = new mongoose.Schema(
                 validator: (items) => items.length >= 0,
             },
         },
-
         totalPrice: {
             type: Number,
             default: 0,
             min: [0, 'Total price cannot be negative'],
         },
-
         status: {
             type: String,
             enum: ['active', 'checked_out', 'abandoned'],

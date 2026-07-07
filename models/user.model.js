@@ -27,20 +27,23 @@ const userSchema = new mongoose.Schema(
             required: [true, 'Shipping Address is required'],
             trim: true,
         },
+        role: {
+            type: String,
+            enum: ['customer', 'admin'],
+            default: 'customer',
+        },
     },
     { timestamps: true }
 );
 
-userSchema.pre('save', async function (next) {
+userSchema.pre('save', async function () {
     if (!this.isModified('password')) {
-        return next();
+        return;
     }
 
     const salt = await bcrypt.genSalt(12);
     this.password = await bcrypt.hash(this.password, salt);
-    next();
 });
-
 userSchema.methods.comparePassword = function (candidatePassword) {
     return bcrypt.compare(candidatePassword, this.password);
 };

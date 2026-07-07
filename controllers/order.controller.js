@@ -11,8 +11,13 @@ const ok = (res, data, msg = 'Success', code = 200) =>
         data,
     });
 
+const canAccessOrder = (order, user) =>
+    user.role === 'admin' || String(order.user) === String(user._id);
+
 exports.getOrders = asyncHandler(async (req, res) => {
-    const orders = await Order.find()
+    const filter = req.user.role === 'admin' ? {} : { user: req.user._id };
+
+    const orders = await Order.find(filter)
         .populate('items.product', 'name price')
         .sort({ createdAt: -1 });
 
@@ -20,18 +25,28 @@ exports.getOrders = asyncHandler(async (req, res) => {
 });
 
 exports.getOrderById = asyncHandler(async (req, res, next) => {
-    const order = await Order.findById(req.params.id)
-        .populate('items.product', 'name category price stock');
+    const order = await Order.findById(req.params.id).populate(
+        'items.product',
+        'name category price stock'
+    );
 
     if (!order) {
         return next(new AppError('Order not found', 404));
+    }
+
+    if (!canAccessOrder(order, req.user)) {
+        return next(
+            new AppError('Forbidden: this order does not belong to you', 403)
+        );
     }
 
     ok(res, order, 'Order fetched successfully');
 });
 
 exports.createOrder = asyncHandler(async (req, res, next) => {
-    const { cartId, shippingAddress } = req.body;
+    const { cartId } = req.body;
+
+    const shippingAddress = req.body.shippingAddress || req.user.address;
 
     if (!cartId) {
         return next(new AppError('cartId is required', 400));
@@ -45,6 +60,12 @@ exports.createOrder = asyncHandler(async (req, res, next) => {
 
     if (!cart) {
         return next(new AppError('Cart not found', 404));
+    }
+
+    if (req.user.role !== 'admin' && String(cart.user) !== String(req.user._id)) {
+        return next(
+            new AppError('Forbidden: this cart does not belong to you', 403)
+        );
     }
 
     if (cart.items.length === 0) {
@@ -90,6 +111,7 @@ exports.createOrder = asyncHandler(async (req, res, next) => {
     );
 
     const order = await Order.create({
+        user: cart.user,
         customerName: cart.customerName,
         shippingAddress,
         items: orderItems,

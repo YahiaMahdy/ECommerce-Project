@@ -31,7 +31,12 @@ const orderSchema = new mongoose.Schema(
             type: String,
             unique: true,
         },
-
+        user: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User',
+            required: [true, 'user is required'],
+            index: true,
+        },
         customerName: {
             type: String,
             required: [true, 'customerName is required'],
@@ -43,7 +48,6 @@ const orderSchema = new mongoose.Schema(
             required: [true, 'shippingAddress is required'],
             trim: true,
         },
-
         items: {
             type: [orderItemSchema],
             required: [true, 'Items are required'],
@@ -52,13 +56,11 @@ const orderSchema = new mongoose.Schema(
                 message: 'Order must contain at least one item.',
             },
         },
-
         totalPrice: {
             type: Number,
             required: [true, 'Total price is required'],
             min: [0, 'Total price cannot be negative'],
         },
-
         status: {
             type: String,
             enum: ['pending', 'confirmed', 'delivered'],

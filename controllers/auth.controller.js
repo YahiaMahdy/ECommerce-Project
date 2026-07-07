@@ -14,6 +14,8 @@ const toSafeUser = (user) => ({
     id: user._id,
     name: user.name,
     email: user.email,
+    address: user.address,
+    role: user.role,
 });
 
 exports.register = asyncHandler(async (req, res, next) => {
