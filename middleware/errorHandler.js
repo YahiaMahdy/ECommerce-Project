@@ -21,6 +21,16 @@ const errorHandler = (err, req, res, next) => {
         message = `${field} already exists`;
     }
 
+    if (err.name === "JsonWebTokenError") {
+        statusCode = 401;
+        message = "Invalid token";
+    }
+
+    if (err.name === "TokenExpiredError") {
+        statusCode = 401;
+        message = "Token has expired";
+    }
+
     const response = {
         status: statusCode < 500 ? "fail" : "error",
         statusCode,

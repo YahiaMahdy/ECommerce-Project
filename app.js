@@ -7,6 +7,7 @@ const productsRouter = require('./routes/products.routes');
 const ordersRouter = require('./routes/orders.routes');
 const cartRouter = require('./routes/cart.routes');
 const categoryRouter = require('./routes/category.routes');
+const authRouter = require('./routes/auth.routes');
 const errorHandler = require('./middleware/errorHandler');
 const AppError = require('./utils/AppError');
 
@@ -15,6 +16,7 @@ const app = express();
 app.use(express.json());
 app.use(mongoSanitize());
 
+app.use('/api/auth', authRouter);
 app.use('/api/categories', categoryRouter);
 app.use('/api/products', productsRouter);
 app.use('/api/orders', ordersRouter);

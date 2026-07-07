@@ -26,8 +26,6 @@ exports.getProducts = asyncHandler(async (req, res) => {
     }
 
     if (inStock !== undefined) {
-        // Derived from live stock count rather than the (unmaintained) inStock
-        // flag on the model, so it stays accurate as stock changes.
         filter.stock = inStock === 'true' ? { $gt: 0 } : { $lte: 0 };
     }
 
