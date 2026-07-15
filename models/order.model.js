@@ -61,15 +61,13 @@ const orderSchema = new mongoose.Schema(
 
         status: {
             type: String,
-            enum: ['pending', 'confirmed', 'delivered'],
+            enum: ['pending', 'confirmed', 'shipped', 'delivered', 'cancelled'],
             default: 'pending',
         },
     },
     { timestamps: true }
 );
 
-// Auto-generate a human-readable order number before validation runs,
-// so callers don't need to supply one manually.
 orderSchema.pre('validate', function generateOrderNumber() {
     if (!this.orderNumber) {
         const datePart = new Date().toISOString().slice(0, 10).replace(/-/g, '');

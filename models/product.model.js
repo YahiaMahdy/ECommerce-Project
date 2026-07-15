@@ -8,6 +8,11 @@ const productSchema = new mongoose.Schema(
             trim: true,
             unique: true,
         },
+        description: {
+            type: String,
+            trim: true,
+            default: '',
+        },
         category: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Category',
@@ -27,6 +32,10 @@ const productSchema = new mongoose.Schema(
         inStock: {
             type: Boolean,
             default: true,
+        },
+        images: {
+            type: [String],
+            required: [true, 'At least one product image is required']
         },
     },
     { timestamps: true }

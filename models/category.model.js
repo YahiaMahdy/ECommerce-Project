@@ -13,6 +13,9 @@ const categorySchema = new mongoose.Schema(
             trim: true,
             default: '',
         },
+        slug: {
+            type: String,
+        },
     },
     { timestamps: true }
 );

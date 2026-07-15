@@ -55,8 +55,6 @@ exports.createOrder = asyncHandler(async (req, res, next) => {
         return next(new AppError('Only active carts can be checked out', 400));
     }
 
-    // Re-validate stock against live product data (stock may have changed
-    // since items were added to the cart) and snapshot name/price server-side.
     const orderItems = [];
 
     for (const item of cart.items) {
@@ -85,7 +83,6 @@ exports.createOrder = asyncHandler(async (req, res, next) => {
         0
     );
 
-    // Reduce stock for each purchased product.
     await Promise.all(
         orderItems.map((item) =>
             Product.findByIdAndUpdate(item.product, { $inc: { stock: -item.quantity } })
@@ -99,7 +96,6 @@ exports.createOrder = asyncHandler(async (req, res, next) => {
         totalPrice,
     });
 
-    // Clear the cart now that it has been converted into an order.
     cart.items = [];
     cart.totalPrice = 0;
     cart.status = 'checked_out';
