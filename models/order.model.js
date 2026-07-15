@@ -63,12 +63,13 @@ const orderSchema = new mongoose.Schema(
         },
         status: {
             type: String,
-            enum: ['pending', 'confirmed', 'delivered'],
+            enum: ['pending', 'confirmed', 'shipped', 'delivered', 'cancelled'],
             default: 'pending',
         },
     },
     { timestamps: true }
 );
+
 orderSchema.pre('validate', function generateOrderNumber() {
     if (!this.orderNumber) {
         const datePart = new Date().toISOString().slice(0, 10).replace(/-/g, '');
