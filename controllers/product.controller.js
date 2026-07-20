@@ -11,34 +11,55 @@ const ok = (res, data, msg = 'Success', code = 200) =>
     });
 
 exports.getProducts = asyncHandler(async (req, res) => {
-    const { category, minPrice, maxPrice, inStock, search } = req.query;
+    const { category, minPrice, maxPrice, inStock,
+        page: pageQ, limit: limitQ,
+        sortBy, order, search, fields } = req.query;
 
     const filter = {};
-
-    if (category) {
-        filter.category = category;
-    }
-
+    if (category) filter.category = category;
     if (minPrice || maxPrice) {
         filter.price = {};
         if (minPrice) filter.price.$gte = Number(minPrice);
         if (maxPrice) filter.price.$lte = Number(maxPrice);
     }
+    if (inStock !== undefined) filter.inStock = inStock === 'true';
+    if (search) filter.name = { $regex: search, $options: 'i' };
 
-    if (inStock !== undefined) {
-        filter.stock = inStock === 'true' ? { $gt: 0 } : { $lte: 0 };
+    const page = Math.max(1, parseInt(pageQ) || 1);
+    const limit = Math.min(50, parseInt(limitQ) || 10);
+    const skip = (page - 1) * limit;
+
+    const allowedSortFields = ['price', 'name', 'createdAt', 'stock'];
+    const sortField = allowedSortFields.includes(sortBy) ? sortBy : 'createdAt';
+    const sortOrder = order === 'asc' ? 1 : -1;
+
+    const allowedFields = ['name', 'category', 'price', 'stock', 'inStock'];
+    let selectStr = '-__v';
+    if (fields) {
+        const requested = fields.split(',').filter(f => allowedFields.includes(f.trim()));
+        if (requested.length > 0) selectStr = requested.join(' ');
     }
 
-    if (search) {
-        filter.name = { $regex: search, $options: 'i' };
-    }
+    const [products, total] = await Promise.all([
+        Product
+            .find(filter)
+            .sort({ [sortField]: sortOrder })
+            .skip(skip)
+            .limit(limit)
+            .select(selectStr)
+            .lean(),
+        Product.countDocuments(filter),
+    ]);
 
-    const products = await Product.find(filter)
-        .populate('category', 'name description')
-        .sort({ createdAt: -1 })
-        .select('-__v');
-
-    ok(res, products, 'Products fetched successfully');
+    ok(res, {
+        products,
+        pagination: {
+            total,
+            page,
+            limit,
+            totalPages: Math.ceil(total / limit),
+        },
+    }, 'Products fetched successfully');
 });
 
 exports.getProductById = asyncHandler(async (req, res, next) => {
