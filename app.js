@@ -1,4 +1,4 @@
-const config = require("../config/config");
+const config = require("./config/config");
 const express = require('express');
 const mongoSanitize = require('express-mongo-sanitize');
 const connectDB = require('./db/connect');
