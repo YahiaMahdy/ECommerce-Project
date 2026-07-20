@@ -1,13 +1,13 @@
 {
   "info": {
     "name": "ECommerce-Project API",
-    "description": "Full test/documentation suite for the ECommerce-Project API (products, categories, cart, orders, auth). Self-contained single-file collection - `baseUrl`, `categoryId`, `productId`, and `orderId` are collection variables (Collection > Variables tab), so no separate environment file is needed. Edit `baseUrl` there if your server isn't on http://localhost:3000. Run folders top-to-bottom (Auth -> Categories -> Products -> Cart -> Orders & Checkout -> Misc -> Cleanup) via Collection Runner; later requests depend on tokens/ids captured by earlier ones. Prerequisite: run `npm run seed` first so the seeded admin account (admin@example.com / AdminPass123) exists - it's the only way to obtain an admin token, since POST /api/auth/register always creates a customer-role account. Every request also carries one saved response example (Examples tab) reflecting what it returns given the current source code; where an example required a call we couldn't verify against a live server in this sandbox (noted on the specific request), it's a best-effort reconstruction rather than a captured response - re-run the collection against your dev server and use 'Save Response > Save as Example' to replace it with a live capture if you want byte-exact examples for grading.",
+    "description": "Full test/documentation suite for the ECommerce-Project API (products, categories, cart, orders, auth), served under /api/v1. Self-contained single-file collection - baseUrl/categoryId/productId/orderId are collection variables (Collection > Variables), no separate environment file needed. \n\nTwo rate limiters apply: a generalLimiter (100 req/15min/IP) in front of every route, and an authLimiter (10 req/15min/IP) in front of the whole /api/v1/auth router - so it covers register as well as login, not just login. \n\nRun folders top-to-bottom (Auth -> Categories -> Products -> Cart -> Orders & Checkout -> Misc -> Cleanup) via Collection Runner; later requests depend on tokens/ids captured by earlier ones. Prerequisite: run `npm run seed` first so the seeded admin account (admin@example.com / AdminPass123) exists. Each request carries one saved response example (Examples tab) reflecting the current source code; these are accurate reconstructions rather than live captures (this sandbox has no route to a live MongoDB) - re-run against your dev server and use 'Save Response > Save as Example' for byte-exact captures if needed.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
     {
       "name": "Auth",
-      "description": "Register/login endpoints. `POST /register` always creates a `customer` role account (role is never read from the request body), so the seeded admin (admin@example.com / AdminPass123, see seed.js) is the only way to get an admin token - run `npm run seed` before running this collection. `/login` is rate-limited to 10 requests / 15 minutes per IP, which this folder stays well under, but running the full collection back-to-back many times in a short window can trip that limiter (by design).",
+      "description": "Register/login endpoints. POST /register always creates a customer role account, so the seeded admin (admin@example.com / AdminPass123, see seed.js) is the only way to get an admin token. /api/v1/auth (both /register AND /login) now shares one authLimiter bucket: 10 requests / 15 minutes per IP - this folder alone uses ~6 of those 10 per run (2 registers + 4 logins), so two consecutive full runs within 15 minutes can trip it on later requests.",
       "item": [
         {
           "name": "Register - Customer A",
@@ -20,12 +20,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/auth/register",
+              "raw": "{{baseUrl}}/api/v1/auth/register",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "auth",
                 "register"
               ]
@@ -90,12 +91,13 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/auth/register",
+                  "raw": "{{baseUrl}}/api/v1/auth/register",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "auth",
                     "register"
                   ]
@@ -135,12 +137,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/auth/register",
+              "raw": "{{baseUrl}}/api/v1/auth/register",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "auth",
                 "register"
               ]
@@ -181,12 +184,13 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/auth/register",
+                  "raw": "{{baseUrl}}/api/v1/auth/register",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "auth",
                     "register"
                   ]
@@ -226,12 +230,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/auth/register",
+              "raw": "{{baseUrl}}/api/v1/auth/register",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "auth",
                 "register"
               ]
@@ -272,12 +277,13 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/auth/register",
+                  "raw": "{{baseUrl}}/api/v1/auth/register",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "auth",
                     "register"
                   ]
@@ -317,12 +323,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/auth/login",
+              "raw": "{{baseUrl}}/api/v1/auth/login",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "auth",
                 "login"
               ]
@@ -370,12 +377,13 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/auth/login",
+                  "raw": "{{baseUrl}}/api/v1/auth/login",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "auth",
                     "login"
                   ]
@@ -416,12 +424,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/auth/login",
+              "raw": "{{baseUrl}}/api/v1/auth/login",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "auth",
                 "login"
               ]
@@ -474,12 +483,13 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/auth/login",
+                  "raw": "{{baseUrl}}/api/v1/auth/login",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "auth",
                     "login"
                   ]
@@ -519,12 +529,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/auth/login",
+              "raw": "{{baseUrl}}/api/v1/auth/login",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "auth",
                 "login"
               ]
@@ -565,12 +576,13 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/auth/login",
+                  "raw": "{{baseUrl}}/api/v1/auth/login",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "auth",
                     "login"
                   ]
@@ -610,12 +622,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/auth/login",
+              "raw": "{{baseUrl}}/api/v1/auth/login",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "auth",
                 "login"
               ]
@@ -656,12 +669,13 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/auth/login",
+                  "raw": "{{baseUrl}}/api/v1/auth/login",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "auth",
                     "login"
                   ]
@@ -701,12 +715,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/auth/register",
+              "raw": "{{baseUrl}}/api/v1/auth/register",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "auth",
                 "register"
               ]
@@ -753,12 +768,13 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/auth/register",
+                  "raw": "{{baseUrl}}/api/v1/auth/register",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "auth",
                     "register"
                   ]
@@ -798,12 +814,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/auth/login",
+              "raw": "{{baseUrl}}/api/v1/auth/login",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "auth",
                 "login"
               ]
@@ -856,12 +873,13 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/auth/login",
+                  "raw": "{{baseUrl}}/api/v1/auth/login",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "auth",
                     "login"
                   ]
@@ -911,12 +929,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/categories",
+              "raw": "{{baseUrl}}/api/v1/categories",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "categories"
               ]
             },
@@ -972,12 +991,13 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/categories",
+                  "raw": "{{baseUrl}}/api/v1/categories",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "categories"
                   ]
                 },
@@ -1020,12 +1040,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/categories",
+              "raw": "{{baseUrl}}/api/v1/categories",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "categories"
               ]
             },
@@ -1075,12 +1096,13 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/categories",
+                  "raw": "{{baseUrl}}/api/v1/categories",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "categories"
                   ]
                 },
@@ -1123,12 +1145,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/categories",
+              "raw": "{{baseUrl}}/api/v1/categories",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "categories"
               ]
             },
@@ -1172,12 +1195,13 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/categories",
+                  "raw": "{{baseUrl}}/api/v1/categories",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "categories"
                   ]
                 },
@@ -1216,12 +1240,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/categories",
+              "raw": "{{baseUrl}}/api/v1/categories",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "categories"
               ]
             },
@@ -1261,12 +1286,13 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/categories",
+                  "raw": "{{baseUrl}}/api/v1/categories",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "categories"
                   ]
                 },
@@ -1309,12 +1335,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/categories",
+              "raw": "{{baseUrl}}/api/v1/categories",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "categories"
               ]
             },
@@ -1358,12 +1385,13 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/categories",
+                  "raw": "{{baseUrl}}/api/v1/categories",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "categories"
                   ]
                 },
@@ -1397,12 +1425,13 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/categories",
+              "raw": "{{baseUrl}}/api/v1/categories",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "categories"
               ]
             }
@@ -1434,12 +1463,13 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "{{baseUrl}}/api/categories",
+                  "raw": "{{baseUrl}}/api/v1/categories",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "categories"
                   ]
                 }
@@ -1464,12 +1494,13 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/categories/{{categoryId}}",
+              "raw": "{{baseUrl}}/api/v1/categories/{{categoryId}}",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "categories",
                 "{{categoryId}}"
               ]
@@ -1498,12 +1529,13 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "{{baseUrl}}/api/categories/{{categoryId}}",
+                  "raw": "{{baseUrl}}/api/v1/categories/{{categoryId}}",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "categories",
                     "{{categoryId}}"
                   ]
@@ -1529,12 +1561,13 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/categories/{{fakeId}}",
+              "raw": "{{baseUrl}}/api/v1/categories/{{fakeId}}",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "categories",
                 "{{fakeId}}"
               ]
@@ -1561,12 +1594,13 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "{{baseUrl}}/api/categories/{{fakeId}}",
+                  "raw": "{{baseUrl}}/api/v1/categories/{{fakeId}}",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "categories",
                     "{{fakeId}}"
                   ]
@@ -1592,12 +1626,13 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/categories/not-a-valid-object-id",
+              "raw": "{{baseUrl}}/api/v1/categories/not-a-valid-object-id",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "categories",
                 "not-a-valid-object-id"
               ]
@@ -1624,12 +1659,13 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "{{baseUrl}}/api/categories/not-a-valid-object-id",
+                  "raw": "{{baseUrl}}/api/v1/categories/not-a-valid-object-id",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "categories",
                     "not-a-valid-object-id"
                   ]
@@ -1664,12 +1700,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/categories/{{categoryId}}",
+              "raw": "{{baseUrl}}/api/v1/categories/{{categoryId}}",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "categories",
                 "{{categoryId}}"
               ]
@@ -1718,12 +1755,13 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/categories/{{categoryId}}",
+                  "raw": "{{baseUrl}}/api/v1/categories/{{categoryId}}",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "categories",
                     "{{categoryId}}"
                   ]
@@ -1767,12 +1805,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/categories/{{fakeId}}",
+              "raw": "{{baseUrl}}/api/v1/categories/{{fakeId}}",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "categories",
                 "{{fakeId}}"
               ]
@@ -1817,12 +1856,13 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/categories/{{fakeId}}",
+                  "raw": "{{baseUrl}}/api/v1/categories/{{fakeId}}",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "categories",
                     "{{fakeId}}"
                   ]
@@ -1862,12 +1902,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/categories/{{categoryId}}",
+              "raw": "{{baseUrl}}/api/v1/categories/{{categoryId}}",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "categories",
                 "{{categoryId}}"
               ]
@@ -1908,12 +1949,13 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/categories/{{categoryId}}",
+                  "raw": "{{baseUrl}}/api/v1/categories/{{categoryId}}",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "categories",
                     "{{categoryId}}"
                   ]
@@ -1957,12 +1999,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/categories/{{categoryId}}",
+              "raw": "{{baseUrl}}/api/v1/categories/{{categoryId}}",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "categories",
                 "{{categoryId}}"
               ]
@@ -2007,12 +2050,13 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/categories/{{categoryId}}",
+                  "raw": "{{baseUrl}}/api/v1/categories/{{categoryId}}",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "categories",
                     "{{categoryId}}"
                   ]
@@ -2047,12 +2091,13 @@
             "method": "DELETE",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/categories/{{fakeId}}",
+              "raw": "{{baseUrl}}/api/v1/categories/{{fakeId}}",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "categories",
                 "{{fakeId}}"
               ]
@@ -2079,12 +2124,13 @@
                 "method": "DELETE",
                 "header": [],
                 "url": {
-                  "raw": "{{baseUrl}}/api/categories/{{fakeId}}",
+                  "raw": "{{baseUrl}}/api/v1/categories/{{fakeId}}",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "categories",
                     "{{fakeId}}"
                   ]
@@ -2115,12 +2161,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/categories/{{fakeId}}",
+              "raw": "{{baseUrl}}/api/v1/categories/{{fakeId}}",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "categories",
                 "{{fakeId}}"
               ]
@@ -2152,12 +2199,13 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/categories/{{fakeId}}",
+                  "raw": "{{baseUrl}}/api/v1/categories/{{fakeId}}",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "categories",
                     "{{fakeId}}"
                   ]
@@ -2181,7 +2229,7 @@
     },
     {
       "name": "Products",
-      "description": "GET routes are public. POST/PUT/PATCH/DELETE require an admin Bearer token. productId is a collection variable (see Collection > Variables) written by the first create request below.",
+      "description": "GET routes are public. POST/PUT/PATCH/DELETE require an admin Bearer token. productId is a collection variable written by the first create request below. GET /api/v1/products is now paginated and sorted: response shape is data: { products, pagination: { total, page, limit, totalPages } } - not a bare array. Supports page, limit (capped at 50, default 10), sortBy (price/name/createdAt/stock, default createdAt), order (asc/desc, default desc), fields (whitelist projection), plus the existing category/minPrice/maxPrice/inStock/search filters. The list endpoint no longer populates category (raw id only) - GET /api/v1/products/:id still does.",
       "item": [
         {
           "name": "Create Product - Laptop, stock 15 (Admin)",
@@ -2198,12 +2246,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/products",
+              "raw": "{{baseUrl}}/api/v1/products",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "products"
               ]
             },
@@ -2259,12 +2308,13 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/products",
+                  "raw": "{{baseUrl}}/api/v1/products",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "products"
                   ]
                 },
@@ -2307,12 +2357,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/products",
+              "raw": "{{baseUrl}}/api/v1/products",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "products"
               ]
             },
@@ -2362,12 +2413,13 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/products",
+                  "raw": "{{baseUrl}}/api/v1/products",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "products"
                   ]
                 },
@@ -2410,12 +2462,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/products",
+              "raw": "{{baseUrl}}/api/v1/products",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "products"
               ]
             },
@@ -2459,12 +2512,13 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/products",
+                  "raw": "{{baseUrl}}/api/v1/products",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "products"
                   ]
                 },
@@ -2507,12 +2561,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/products",
+              "raw": "{{baseUrl}}/api/v1/products",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "products"
               ]
             },
@@ -2556,12 +2611,13 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/products",
+                  "raw": "{{baseUrl}}/api/v1/products",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "products"
                   ]
                 },
@@ -2600,12 +2656,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/products",
+              "raw": "{{baseUrl}}/api/v1/products",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "products"
               ]
             },
@@ -2645,12 +2702,13 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/products",
+                  "raw": "{{baseUrl}}/api/v1/products",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "products"
                   ]
                 },
@@ -2693,12 +2751,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/products",
+              "raw": "{{baseUrl}}/api/v1/products",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "products"
               ]
             },
@@ -2742,12 +2801,13 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/products",
+                  "raw": "{{baseUrl}}/api/v1/products",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "products"
                   ]
                 },
@@ -2781,12 +2841,13 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/products",
+              "raw": "{{baseUrl}}/api/v1/products",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "products"
               ]
             }
@@ -2795,17 +2856,15 @@
             {
               "listen": "test",
               "script": {
-                "id": "script-31",
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Status code is 200\", function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "pm.test(\"Response has {status, message, data} envelope\", function () {",
+                  "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Response is paginated: {products, pagination}\", function () {",
                   "    const json = pm.response.json();",
-                  "    pm.expect(json).to.have.property(\"status\");",
-                  "    pm.expect(json).to.have.property(\"message\");",
-                  "    pm.expect(json).to.have.property(\"data\");",
+                  "    pm.expect(json.data.products).to.be.an(\"array\");",
+                  "    pm.expect(json.data.pagination).to.include.all.keys(\"total\", \"page\", \"limit\", \"totalPages\");",
+                  "    pm.expect(json.data.pagination.page).to.eql(1);",
+                  "    pm.expect(json.data.pagination.limit).to.eql(10);",
                   "});"
                 ]
               }
@@ -2818,12 +2877,13 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "{{baseUrl}}/api/products",
+                  "raw": "{{baseUrl}}/api/v1/products",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "products"
                   ]
                 }
@@ -2838,7 +2898,7 @@
                 }
               ],
               "cookie": [],
-              "body": "{\n  \"status\": \"success\",\n  \"message\": \"Products fetched successfully\",\n  \"data\": [\n    {\n      \"_id\": \"664f1a2b3c4d5e6f7a8b9c12\",\n      \"name\": \"Mouse\",\n      \"description\": \"\",\n      \"category\": {\n        \"_id\": \"664f1a2b3c4d5e6f7a8b9c01\",\n        \"name\": \"Electronics\",\n        \"description\": \"Electronic devices and accessories\"\n      },\n      \"price\": 25,\n      \"stock\": 3,\n      \"inStock\": true,\n      \"images\": [\n        \"https://picsum.photos/seed/mouse/600/400\"\n      ],\n      \"createdAt\": \"2026-07-16T10:15:00.000Z\",\n      \"updatedAt\": \"2026-07-16T10:15:00.000Z\"\n    },\n    {\n      \"_id\": \"664f1a2b3c4d5e6f7a8b9c11\",\n      \"name\": \"Laptop\",\n      \"description\": \"\",\n      \"category\": {\n        \"_id\": \"664f1a2b3c4d5e6f7a8b9c01\",\n        \"name\": \"Electronics\",\n        \"description\": \"Electronic devices and accessories\"\n      },\n      \"price\": 999,\n      \"stock\": 15,\n      \"inStock\": true,\n      \"images\": [\n        \"https://picsum.photos/seed/laptop/600/400\"\n      ],\n      \"createdAt\": \"2026-07-16T10:15:00.000Z\",\n      \"updatedAt\": \"2026-07-16T10:15:00.000Z\"\n    }\n  ]\n}"
+              "body": "{\n  \"status\": \"success\",\n  \"message\": \"Products fetched successfully\",\n  \"data\": {\n    \"products\": [\n      {\n        \"_id\": \"664f1a2b3c4d5e6f7a8b9c12\",\n        \"name\": \"Mouse\",\n        \"category\": \"664f1a2b3c4d5e6f7a8b9c01\",\n        \"price\": 25,\n        \"stock\": 3,\n        \"inStock\": true,\n        \"createdAt\": \"2026-07-16T10:15:00.000Z\",\n        \"updatedAt\": \"2026-07-16T10:15:00.000Z\"\n      },\n      {\n        \"_id\": \"664f1a2b3c4d5e6f7a8b9c11\",\n        \"name\": \"Laptop\",\n        \"category\": \"664f1a2b3c4d5e6f7a8b9c01\",\n        \"price\": 999,\n        \"stock\": 15,\n        \"inStock\": true,\n        \"createdAt\": \"2026-07-16T10:15:00.000Z\",\n        \"updatedAt\": \"2026-07-16T10:15:00.000Z\"\n      }\n    ],\n    \"pagination\": {\n      \"total\": 2,\n      \"page\": 1,\n      \"limit\": 10,\n      \"totalPages\": 1\n    }\n  }\n}"
             }
           ]
         },
@@ -2848,12 +2908,13 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/products?category={{categoryId}}",
+              "raw": "{{baseUrl}}/api/v1/products?category={{categoryId}}",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "products"
               ],
               "query": [
@@ -2868,14 +2929,13 @@
             {
               "listen": "test",
               "script": {
-                "id": "script-32",
                 "type": "text/javascript",
                 "exec": [
                   "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
-                  "pm.test(\"Every product belongs to the filtered category\", function () {",
+                  "pm.test(\"Every product belongs to the filtered category (raw id - list endpoint does not populate)\", function () {",
                   "    const json = pm.response.json();",
                   "    const categoryId = pm.collectionVariables.get(\"categoryId\");",
-                  "    json.data.forEach((p) => pm.expect(p.category._id).to.eql(categoryId));",
+                  "    json.data.products.forEach((p) => pm.expect(p.category).to.eql(categoryId));",
                   "});"
                 ]
               }
@@ -2888,12 +2948,13 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "{{baseUrl}}/api/products?category={{categoryId}}",
+                  "raw": "{{baseUrl}}/api/v1/products?category={{categoryId}}",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "products"
                   ],
                   "query": [
@@ -2914,7 +2975,7 @@
                 }
               ],
               "cookie": [],
-              "body": "{\n  \"status\": \"success\",\n  \"message\": \"Products fetched successfully\",\n  \"data\": [\n    {\n      \"_id\": \"664f1a2b3c4d5e6f7a8b9c11\",\n      \"name\": \"Laptop\",\n      \"description\": \"\",\n      \"category\": {\n        \"_id\": \"664f1a2b3c4d5e6f7a8b9c01\",\n        \"name\": \"Electronics\",\n        \"description\": \"Electronic devices and accessories\"\n      },\n      \"price\": 999,\n      \"stock\": 15,\n      \"inStock\": true,\n      \"images\": [\n        \"https://picsum.photos/seed/laptop/600/400\"\n      ],\n      \"createdAt\": \"2026-07-16T10:15:00.000Z\",\n      \"updatedAt\": \"2026-07-16T10:15:00.000Z\"\n    }\n  ]\n}"
+              "body": "{\n  \"status\": \"success\",\n  \"message\": \"Products fetched successfully\",\n  \"data\": {\n    \"products\": [\n      {\n        \"_id\": \"664f1a2b3c4d5e6f7a8b9c11\",\n        \"name\": \"Laptop\",\n        \"category\": \"664f1a2b3c4d5e6f7a8b9c01\",\n        \"price\": 999,\n        \"stock\": 15,\n        \"inStock\": true,\n        \"createdAt\": \"2026-07-16T10:15:00.000Z\",\n        \"updatedAt\": \"2026-07-16T10:15:00.000Z\"\n      }\n    ],\n    \"pagination\": {\n      \"total\": 1,\n      \"page\": 1,\n      \"limit\": 10,\n      \"totalPages\": 1\n    }\n  }\n}"
             }
           ]
         },
@@ -2924,12 +2985,13 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/products?minPrice=500&maxPrice=1500",
+              "raw": "{{baseUrl}}/api/v1/products?minPrice=500&maxPrice=1500",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "products"
               ],
               "query": [
@@ -2948,13 +3010,12 @@
             {
               "listen": "test",
               "script": {
-                "id": "script-33",
                 "type": "text/javascript",
                 "exec": [
                   "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
                   "pm.test(\"Every product price is within range\", function () {",
                   "    const json = pm.response.json();",
-                  "    json.data.forEach((p) => {",
+                  "    json.data.products.forEach((p) => {",
                   "        pm.expect(p.price).to.be.at.least(500);",
                   "        pm.expect(p.price).to.be.at.most(1500);",
                   "    });",
@@ -2970,12 +3031,13 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "{{baseUrl}}/api/products?minPrice=500&maxPrice=1500",
+                  "raw": "{{baseUrl}}/api/v1/products?minPrice=500&maxPrice=1500",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "products"
                   ],
                   "query": [
@@ -3000,7 +3062,7 @@
                 }
               ],
               "cookie": [],
-              "body": "{\n  \"status\": \"success\",\n  \"message\": \"Products fetched successfully\",\n  \"data\": [\n    {\n      \"_id\": \"664f1a2b3c4d5e6f7a8b9c11\",\n      \"name\": \"Laptop\",\n      \"description\": \"\",\n      \"category\": {\n        \"_id\": \"664f1a2b3c4d5e6f7a8b9c01\",\n        \"name\": \"Electronics\",\n        \"description\": \"Electronic devices and accessories\"\n      },\n      \"price\": 999,\n      \"stock\": 15,\n      \"inStock\": true,\n      \"images\": [\n        \"https://picsum.photos/seed/laptop/600/400\"\n      ],\n      \"createdAt\": \"2026-07-16T10:15:00.000Z\",\n      \"updatedAt\": \"2026-07-16T10:15:00.000Z\"\n    }\n  ]\n}"
+              "body": "{\n  \"status\": \"success\",\n  \"message\": \"Products fetched successfully\",\n  \"data\": {\n    \"products\": [\n      {\n        \"_id\": \"664f1a2b3c4d5e6f7a8b9c11\",\n        \"name\": \"Laptop\",\n        \"category\": \"664f1a2b3c4d5e6f7a8b9c01\",\n        \"price\": 999,\n        \"stock\": 15,\n        \"inStock\": true,\n        \"createdAt\": \"2026-07-16T10:15:00.000Z\",\n        \"updatedAt\": \"2026-07-16T10:15:00.000Z\"\n      }\n    ],\n    \"pagination\": {\n      \"total\": 1,\n      \"page\": 1,\n      \"limit\": 10,\n      \"totalPages\": 1\n    }\n  }\n}"
             }
           ]
         },
@@ -3010,12 +3072,13 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/products?inStock=true",
+              "raw": "{{baseUrl}}/api/v1/products?inStock=true",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "products"
               ],
               "query": [
@@ -3024,19 +3087,19 @@
                   "value": "true"
                 }
               ]
-            }
+            },
+            "description": "inStock now filters on the stored `inStock` boolean field directly (reverted from filtering by live `stock` count). That field defaults to true and nothing in the current codebase updates it when stock changes via orders/cart, so it can drift from the real stock level over time - worth knowing if you rely on it."
           },
           "event": [
             {
               "listen": "test",
               "script": {
-                "id": "script-34",
                 "type": "text/javascript",
                 "exec": [
                   "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
-                  "pm.test(\"Every product returned has stock > 0\", function () {",
+                  "pm.test(\"Every product returned has inStock === true\", function () {",
                   "    const json = pm.response.json();",
-                  "    json.data.forEach((p) => pm.expect(p.stock).to.be.above(0));",
+                  "    json.data.products.forEach((p) => pm.expect(p.inStock).to.eql(true));",
                   "});"
                 ]
               }
@@ -3049,12 +3112,13 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "{{baseUrl}}/api/products?inStock=true",
+                  "raw": "{{baseUrl}}/api/v1/products?inStock=true",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "products"
                   ],
                   "query": [
@@ -3075,7 +3139,7 @@
                 }
               ],
               "cookie": [],
-              "body": "{\n  \"status\": \"success\",\n  \"message\": \"Products fetched successfully\",\n  \"data\": [\n    {\n      \"_id\": \"664f1a2b3c4d5e6f7a8b9c12\",\n      \"name\": \"Mouse\",\n      \"description\": \"\",\n      \"category\": {\n        \"_id\": \"664f1a2b3c4d5e6f7a8b9c01\",\n        \"name\": \"Electronics\",\n        \"description\": \"Electronic devices and accessories\"\n      },\n      \"price\": 25,\n      \"stock\": 3,\n      \"inStock\": true,\n      \"images\": [\n        \"https://picsum.photos/seed/mouse/600/400\"\n      ],\n      \"createdAt\": \"2026-07-16T10:15:00.000Z\",\n      \"updatedAt\": \"2026-07-16T10:15:00.000Z\"\n    },\n    {\n      \"_id\": \"664f1a2b3c4d5e6f7a8b9c11\",\n      \"name\": \"Laptop\",\n      \"description\": \"\",\n      \"category\": {\n        \"_id\": \"664f1a2b3c4d5e6f7a8b9c01\",\n        \"name\": \"Electronics\",\n        \"description\": \"Electronic devices and accessories\"\n      },\n      \"price\": 999,\n      \"stock\": 15,\n      \"inStock\": true,\n      \"images\": [\n        \"https://picsum.photos/seed/laptop/600/400\"\n      ],\n      \"createdAt\": \"2026-07-16T10:15:00.000Z\",\n      \"updatedAt\": \"2026-07-16T10:15:00.000Z\"\n    }\n  ]\n}"
+              "body": "{\n  \"status\": \"success\",\n  \"message\": \"Products fetched successfully\",\n  \"data\": {\n    \"products\": [\n      {\n        \"_id\": \"664f1a2b3c4d5e6f7a8b9c12\",\n        \"name\": \"Mouse\",\n        \"category\": \"664f1a2b3c4d5e6f7a8b9c01\",\n        \"price\": 25,\n        \"stock\": 3,\n        \"inStock\": true,\n        \"createdAt\": \"2026-07-16T10:15:00.000Z\",\n        \"updatedAt\": \"2026-07-16T10:15:00.000Z\"\n      },\n      {\n        \"_id\": \"664f1a2b3c4d5e6f7a8b9c11\",\n        \"name\": \"Laptop\",\n        \"category\": \"664f1a2b3c4d5e6f7a8b9c01\",\n        \"price\": 999,\n        \"stock\": 15,\n        \"inStock\": true,\n        \"createdAt\": \"2026-07-16T10:15:00.000Z\",\n        \"updatedAt\": \"2026-07-16T10:15:00.000Z\"\n      }\n    ],\n    \"pagination\": {\n      \"total\": 2,\n      \"page\": 1,\n      \"limit\": 10,\n      \"totalPages\": 1\n    }\n  }\n}"
             }
           ]
         },
@@ -3085,12 +3149,13 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/products?search=Laptop",
+              "raw": "{{baseUrl}}/api/v1/products?search=Laptop",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "products"
               ],
               "query": [
@@ -3105,13 +3170,12 @@
             {
               "listen": "test",
               "script": {
-                "id": "script-35",
                 "type": "text/javascript",
                 "exec": [
                   "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
                   "pm.test(\"Every result name matches the search term\", function () {",
                   "    const json = pm.response.json();",
-                  "    json.data.forEach((p) => pm.expect(p.name.toLowerCase()).to.include(\"laptop\"));",
+                  "    json.data.products.forEach((p) => pm.expect(p.name.toLowerCase()).to.include(\"laptop\"));",
                   "});"
                 ]
               }
@@ -3124,12 +3188,13 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "{{baseUrl}}/api/products?search=Laptop",
+                  "raw": "{{baseUrl}}/api/v1/products?search=Laptop",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "products"
                   ],
                   "query": [
@@ -3150,7 +3215,260 @@
                 }
               ],
               "cookie": [],
-              "body": "{\n  \"status\": \"success\",\n  \"message\": \"Products fetched successfully\",\n  \"data\": [\n    {\n      \"_id\": \"664f1a2b3c4d5e6f7a8b9c11\",\n      \"name\": \"Laptop\",\n      \"description\": \"\",\n      \"category\": {\n        \"_id\": \"664f1a2b3c4d5e6f7a8b9c01\",\n        \"name\": \"Electronics\",\n        \"description\": \"Electronic devices and accessories\"\n      },\n      \"price\": 999,\n      \"stock\": 15,\n      \"inStock\": true,\n      \"images\": [\n        \"https://picsum.photos/seed/laptop/600/400\"\n      ],\n      \"createdAt\": \"2026-07-16T10:15:00.000Z\",\n      \"updatedAt\": \"2026-07-16T10:15:00.000Z\"\n    }\n  ]\n}"
+              "body": "{\n  \"status\": \"success\",\n  \"message\": \"Products fetched successfully\",\n  \"data\": {\n    \"products\": [\n      {\n        \"_id\": \"664f1a2b3c4d5e6f7a8b9c11\",\n        \"name\": \"Laptop\",\n        \"category\": \"664f1a2b3c4d5e6f7a8b9c01\",\n        \"price\": 999,\n        \"stock\": 15,\n        \"inStock\": true,\n        \"createdAt\": \"2026-07-16T10:15:00.000Z\",\n        \"updatedAt\": \"2026-07-16T10:15:00.000Z\"\n      }\n    ],\n    \"pagination\": {\n      \"total\": 1,\n      \"page\": 1,\n      \"limit\": 10,\n      \"totalPages\": 1\n    }\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Products - Pagination (page 1, limit 1)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/products?page=1&limit=1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "products"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "`limit` is capped at 50 server-side regardless of what is requested."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/products?page=1&limit=1",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "products"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "1"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"status\": \"success\",\n  \"message\": \"Products fetched successfully\",\n  \"data\": {\n    \"products\": [\n      {\n        \"_id\": \"664f1a2b3c4d5e6f7a8b9c12\",\n        \"name\": \"Mouse\",\n        \"category\": \"664f1a2b3c4d5e6f7a8b9c01\",\n        \"price\": 25,\n        \"stock\": 3,\n        \"inStock\": true,\n        \"createdAt\": \"2026-07-16T10:15:00.000Z\",\n        \"updatedAt\": \"2026-07-16T10:15:00.000Z\"\n      }\n    ],\n    \"pagination\": {\n      \"total\": 2,\n      \"page\": 1,\n      \"limit\": 1,\n      \"totalPages\": 2\n    }\n  }\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Returns exactly `limit` items and correct pagination metadata\", function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.data.products.length).to.be.at.most(1);",
+                  "    pm.expect(json.data.pagination.limit).to.eql(1);",
+                  "    pm.expect(json.data.pagination.page).to.eql(1);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Products - Sort by price ascending",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/products?sortBy=price&order=asc",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "products"
+              ],
+              "query": [
+                {
+                  "key": "sortBy",
+                  "value": "price"
+                },
+                {
+                  "key": "order",
+                  "value": "asc"
+                }
+              ]
+            },
+            "description": "Allowed sortBy values: price, name, createdAt, stock (default createdAt, default order desc). Anything else silently falls back to the default rather than erroring."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/products?sortBy=price&order=asc",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "products"
+                  ],
+                  "query": [
+                    {
+                      "key": "sortBy",
+                      "value": "price"
+                    },
+                    {
+                      "key": "order",
+                      "value": "asc"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"status\": \"success\",\n  \"message\": \"Products fetched successfully\",\n  \"data\": {\n    \"products\": [\n      {\n        \"_id\": \"664f1a2b3c4d5e6f7a8b9c12\",\n        \"name\": \"Mouse\",\n        \"category\": \"664f1a2b3c4d5e6f7a8b9c01\",\n        \"price\": 25,\n        \"stock\": 3,\n        \"inStock\": true,\n        \"createdAt\": \"2026-07-16T10:15:00.000Z\",\n        \"updatedAt\": \"2026-07-16T10:15:00.000Z\"\n      },\n      {\n        \"_id\": \"664f1a2b3c4d5e6f7a8b9c11\",\n        \"name\": \"Laptop\",\n        \"category\": \"664f1a2b3c4d5e6f7a8b9c01\",\n        \"price\": 999,\n        \"stock\": 15,\n        \"inStock\": true,\n        \"createdAt\": \"2026-07-16T10:15:00.000Z\",\n        \"updatedAt\": \"2026-07-16T10:15:00.000Z\"\n      }\n    ],\n    \"pagination\": {\n      \"total\": 2,\n      \"page\": 1,\n      \"limit\": 10,\n      \"totalPages\": 1\n    }\n  }\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Products are sorted by price ascending\", function () {",
+                  "    const json = pm.response.json();",
+                  "    const prices = json.data.products.map((p) => p.price);",
+                  "    const sorted = [...prices].sort((a, b) => a - b);",
+                  "    pm.expect(prices).to.eql(sorted);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Products - Field selection (fields=name,price)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/products?fields=name,price",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "products"
+              ],
+              "query": [
+                {
+                  "key": "fields",
+                  "value": "name,price"
+                }
+              ]
+            },
+            "description": "Only name/category/price/stock/inStock are selectable via `fields`; anything else in the list is silently dropped, and an entirely-invalid list falls back to returning every field (minus __v)."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/products?fields=name,price",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "products"
+                  ],
+                  "query": [
+                    {
+                      "key": "fields",
+                      "value": "name,price"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"status\": \"success\",\n  \"message\": \"Products fetched successfully\",\n  \"data\": {\n    \"products\": [\n      {\n        \"_id\": \"664f1a2b3c4d5e6f7a8b9c12\",\n        \"name\": \"Mouse\",\n        \"price\": 25\n      },\n      {\n        \"_id\": \"664f1a2b3c4d5e6f7a8b9c11\",\n        \"name\": \"Laptop\",\n        \"price\": 999\n      }\n    ],\n    \"pagination\": {\n      \"total\": 2,\n      \"page\": 1,\n      \"limit\": 10,\n      \"totalPages\": 1\n    }\n  }\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Only the requested fields (plus _id) are present\", function () {",
+                  "    const json = pm.response.json();",
+                  "    json.data.products.forEach((p) => {",
+                  "        pm.expect(Object.keys(p).sort()).to.eql([\"_id\", \"name\", \"price\"]);",
+                  "    });",
+                  "});"
+                ]
+              }
             }
           ]
         },
@@ -3160,12 +3478,13 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/products/{{productId}}",
+              "raw": "{{baseUrl}}/api/v1/products/{{productId}}",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "products",
                 "{{productId}}"
               ]
@@ -3196,12 +3515,13 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "{{baseUrl}}/api/products/{{productId}}",
+                  "raw": "{{baseUrl}}/api/v1/products/{{productId}}",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "products",
                     "{{productId}}"
                   ]
@@ -3227,12 +3547,13 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/products/{{fakeId}}",
+              "raw": "{{baseUrl}}/api/v1/products/{{fakeId}}",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "products",
                 "{{fakeId}}"
               ]
@@ -3259,12 +3580,13 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "{{baseUrl}}/api/products/{{fakeId}}",
+                  "raw": "{{baseUrl}}/api/v1/products/{{fakeId}}",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "products",
                     "{{fakeId}}"
                   ]
@@ -3299,12 +3621,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/products/{{productId}}",
+              "raw": "{{baseUrl}}/api/v1/products/{{productId}}",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "products",
                 "{{productId}}"
               ]
@@ -3353,12 +3676,13 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/products/{{productId}}",
+                  "raw": "{{baseUrl}}/api/v1/products/{{productId}}",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "products",
                     "{{productId}}"
                   ]
@@ -3398,12 +3722,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/products/{{productId}}",
+              "raw": "{{baseUrl}}/api/v1/products/{{productId}}",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "products",
                 "{{productId}}"
               ]
@@ -3444,12 +3769,13 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/products/{{productId}}",
+                  "raw": "{{baseUrl}}/api/v1/products/{{productId}}",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "products",
                     "{{productId}}"
                   ]
@@ -3493,12 +3819,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/products/{{productId}}",
+              "raw": "{{baseUrl}}/api/v1/products/{{productId}}",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "products",
                 "{{productId}}"
               ]
@@ -3543,12 +3870,13 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/products/{{productId}}",
+                  "raw": "{{baseUrl}}/api/v1/products/{{productId}}",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "products",
                     "{{productId}}"
                   ]
@@ -3592,12 +3920,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/products/{{productId2}}",
+              "raw": "{{baseUrl}}/api/v1/products/{{productId2}}",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "products",
                 "{{productId2}}"
               ]
@@ -3643,12 +3972,13 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/products/{{productId2}}",
+                  "raw": "{{baseUrl}}/api/v1/products/{{productId2}}",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "products",
                     "{{productId2}}"
                   ]
@@ -3693,12 +4023,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/products/{{productId2}}",
+              "raw": "{{baseUrl}}/api/v1/products/{{productId2}}",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "products",
                 "{{productId2}}"
               ]
@@ -3743,12 +4074,13 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/products/{{productId2}}",
+                  "raw": "{{baseUrl}}/api/v1/products/{{productId2}}",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "products",
                     "{{productId2}}"
                   ]
@@ -3792,12 +4124,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/products/{{fakeId}}",
+              "raw": "{{baseUrl}}/api/v1/products/{{fakeId}}",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "products",
                 "{{fakeId}}"
               ]
@@ -3842,12 +4175,13 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/products/{{fakeId}}",
+                  "raw": "{{baseUrl}}/api/v1/products/{{fakeId}}",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "products",
                     "{{fakeId}}"
                   ]
@@ -3882,12 +4216,13 @@
             "method": "DELETE",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/products/{{fakeId}}",
+              "raw": "{{baseUrl}}/api/v1/products/{{fakeId}}",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "products",
                 "{{fakeId}}"
               ]
@@ -3914,12 +4249,13 @@
                 "method": "DELETE",
                 "header": [],
                 "url": {
-                  "raw": "{{baseUrl}}/api/products/{{fakeId}}",
+                  "raw": "{{baseUrl}}/api/v1/products/{{fakeId}}",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "products",
                     "{{fakeId}}"
                   ]
@@ -3950,12 +4286,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/products/{{fakeId}}",
+              "raw": "{{baseUrl}}/api/v1/products/{{fakeId}}",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "products",
                 "{{fakeId}}"
               ]
@@ -3987,12 +4324,13 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/products/{{fakeId}}",
+                  "raw": "{{baseUrl}}/api/v1/products/{{fakeId}}",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "products",
                     "{{fakeId}}"
                   ]
@@ -4029,12 +4367,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/cart",
+              "raw": "{{baseUrl}}/api/v1/cart",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "cart"
               ]
             },
@@ -4074,12 +4413,13 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/cart",
+                  "raw": "{{baseUrl}}/api/v1/cart",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "cart"
                   ]
                 },
@@ -4122,12 +4462,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/cart",
+              "raw": "{{baseUrl}}/api/v1/cart",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "cart"
               ]
             },
@@ -4183,12 +4524,13 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/cart",
+                  "raw": "{{baseUrl}}/api/v1/cart",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "cart"
                   ]
                 },
@@ -4227,12 +4569,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/cart",
+              "raw": "{{baseUrl}}/api/v1/cart",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "cart"
               ]
             }
@@ -4266,12 +4609,13 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/cart",
+                  "raw": "{{baseUrl}}/api/v1/cart",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "cart"
                   ]
                 }
@@ -4301,12 +4645,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/cart/{{cartId}}",
+              "raw": "{{baseUrl}}/api/v1/cart/{{cartId}}",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "cart",
                 "{{cartId}}"
               ]
@@ -4338,12 +4683,13 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/cart/{{cartId}}",
+                  "raw": "{{baseUrl}}/api/v1/cart/{{cartId}}",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "cart",
                     "{{cartId}}"
                   ]
@@ -4374,12 +4720,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/cart/{{fakeId}}",
+              "raw": "{{baseUrl}}/api/v1/cart/{{fakeId}}",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "cart",
                 "{{fakeId}}"
               ]
@@ -4411,12 +4758,13 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/cart/{{fakeId}}",
+                  "raw": "{{baseUrl}}/api/v1/cart/{{fakeId}}",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "cart",
                     "{{fakeId}}"
                   ]
@@ -4447,12 +4795,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/cart/{{cartId}}",
+              "raw": "{{baseUrl}}/api/v1/cart/{{cartId}}",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "cart",
                 "{{cartId}}"
               ]
@@ -4484,12 +4833,13 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/cart/{{cartId}}",
+                  "raw": "{{baseUrl}}/api/v1/cart/{{cartId}}",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "cart",
                     "{{cartId}}"
                   ]
@@ -4520,12 +4870,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/cart/{{cartId}}",
+              "raw": "{{baseUrl}}/api/v1/cart/{{cartId}}",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "cart",
                 "{{cartId}}"
               ]
@@ -4557,12 +4908,13 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/cart/{{cartId}}",
+                  "raw": "{{baseUrl}}/api/v1/cart/{{cartId}}",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "cart",
                     "{{cartId}}"
                   ]
@@ -4597,12 +4949,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/cart/{{cartId}}/items",
+              "raw": "{{baseUrl}}/api/v1/cart/{{cartId}}/items",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "cart",
                 "{{cartId}}",
                 "items"
@@ -4656,12 +5009,13 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/cart/{{cartId}}/items",
+                  "raw": "{{baseUrl}}/api/v1/cart/{{cartId}}/items",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "cart",
                     "{{cartId}}",
                     "items"
@@ -4706,12 +5060,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/cart/{{cartId}}/items",
+              "raw": "{{baseUrl}}/api/v1/cart/{{cartId}}/items",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "cart",
                 "{{cartId}}",
                 "items"
@@ -4763,12 +5118,13 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/cart/{{cartId}}/items",
+                  "raw": "{{baseUrl}}/api/v1/cart/{{cartId}}/items",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "cart",
                     "{{cartId}}",
                     "items"
@@ -4813,12 +5169,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/cart/{{cartId}}/items",
+              "raw": "{{baseUrl}}/api/v1/cart/{{cartId}}/items",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "cart",
                 "{{cartId}}",
                 "items"
@@ -4864,12 +5221,13 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/cart/{{cartId}}/items",
+                  "raw": "{{baseUrl}}/api/v1/cart/{{cartId}}/items",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "cart",
                     "{{cartId}}",
                     "items"
@@ -4914,12 +5272,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/cart/{{cartId}}/items",
+              "raw": "{{baseUrl}}/api/v1/cart/{{cartId}}/items",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "cart",
                 "{{cartId}}",
                 "items"
@@ -4965,12 +5324,13 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/cart/{{cartId}}/items",
+                  "raw": "{{baseUrl}}/api/v1/cart/{{cartId}}/items",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "cart",
                     "{{cartId}}",
                     "items"
@@ -5015,12 +5375,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/cart/{{fakeId}}/items",
+              "raw": "{{baseUrl}}/api/v1/cart/{{fakeId}}/items",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "cart",
                 "{{fakeId}}",
                 "items"
@@ -5066,12 +5427,13 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/cart/{{fakeId}}/items",
+                  "raw": "{{baseUrl}}/api/v1/cart/{{fakeId}}/items",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "cart",
                     "{{fakeId}}",
                     "items"
@@ -5116,12 +5478,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/cart/{{cartId}}/items",
+              "raw": "{{baseUrl}}/api/v1/cart/{{cartId}}/items",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "cart",
                 "{{cartId}}",
                 "items"
@@ -5167,12 +5530,13 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/cart/{{cartId}}/items",
+                  "raw": "{{baseUrl}}/api/v1/cart/{{cartId}}/items",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "cart",
                     "{{cartId}}",
                     "items"
@@ -5217,12 +5581,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/cart/{{cartId}}/items",
+              "raw": "{{baseUrl}}/api/v1/cart/{{cartId}}/items",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "cart",
                 "{{cartId}}",
                 "items"
@@ -5268,12 +5633,13 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/cart/{{cartId}}/items",
+                  "raw": "{{baseUrl}}/api/v1/cart/{{cartId}}/items",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "cart",
                     "{{cartId}}",
                     "items"
@@ -5318,12 +5684,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/cart/{{cartId}}/items/{{productId2}}",
+              "raw": "{{baseUrl}}/api/v1/cart/{{cartId}}/items/{{productId2}}",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "cart",
                 "{{cartId}}",
                 "items",
@@ -5375,12 +5742,13 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/cart/{{cartId}}/items/{{productId2}}",
+                  "raw": "{{baseUrl}}/api/v1/cart/{{cartId}}/items/{{productId2}}",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "cart",
                     "{{cartId}}",
                     "items",
@@ -5426,12 +5794,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/cart/{{cartId}}/items/{{productId2}}",
+              "raw": "{{baseUrl}}/api/v1/cart/{{cartId}}/items/{{productId2}}",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "cart",
                 "{{cartId}}",
                 "items",
@@ -5478,12 +5847,13 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/cart/{{cartId}}/items/{{productId2}}",
+                  "raw": "{{baseUrl}}/api/v1/cart/{{cartId}}/items/{{productId2}}",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "cart",
                     "{{cartId}}",
                     "items",
@@ -5529,12 +5899,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/cart/{{cartId}}/items/{{fakeId}}",
+              "raw": "{{baseUrl}}/api/v1/cart/{{cartId}}/items/{{fakeId}}",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "cart",
                 "{{cartId}}",
                 "items",
@@ -5581,12 +5952,13 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/cart/{{cartId}}/items/{{fakeId}}",
+                  "raw": "{{baseUrl}}/api/v1/cart/{{cartId}}/items/{{fakeId}}",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "cart",
                     "{{cartId}}",
                     "items",
@@ -5628,12 +6000,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/cart/{{cartId}}/items/{{productId2}}",
+              "raw": "{{baseUrl}}/api/v1/cart/{{cartId}}/items/{{productId2}}",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "cart",
                 "{{cartId}}",
                 "items",
@@ -5672,12 +6045,13 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/cart/{{cartId}}/items/{{productId2}}",
+                  "raw": "{{baseUrl}}/api/v1/cart/{{cartId}}/items/{{productId2}}",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "cart",
                     "{{cartId}}",
                     "items",
@@ -5710,12 +6084,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/cart/{{cartId}}/items/{{fakeId}}",
+              "raw": "{{baseUrl}}/api/v1/cart/{{cartId}}/items/{{fakeId}}",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "cart",
                 "{{cartId}}",
                 "items",
@@ -5749,12 +6124,13 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/cart/{{cartId}}/items/{{fakeId}}",
+                  "raw": "{{baseUrl}}/api/v1/cart/{{cartId}}/items/{{fakeId}}",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "cart",
                     "{{cartId}}",
                     "items",
@@ -5791,12 +6167,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/cart/{{cartId}}/status",
+              "raw": "{{baseUrl}}/api/v1/cart/{{cartId}}/status",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "cart",
                 "{{cartId}}",
                 "status"
@@ -5842,12 +6219,13 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/cart/{{cartId}}/status",
+                  "raw": "{{baseUrl}}/api/v1/cart/{{cartId}}/status",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "cart",
                     "{{cartId}}",
                     "status"
@@ -5892,12 +6270,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/cart",
+              "raw": "{{baseUrl}}/api/v1/cart",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "cart"
               ]
             },
@@ -5947,12 +6326,13 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/cart",
+                  "raw": "{{baseUrl}}/api/v1/cart",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "cart"
                   ]
                 },
@@ -5995,12 +6375,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/cart/{{cartId2}}/items",
+              "raw": "{{baseUrl}}/api/v1/cart/{{cartId2}}/items",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "cart",
                 "{{cartId2}}",
                 "items"
@@ -6046,12 +6427,13 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/cart/{{cartId2}}/items",
+                  "raw": "{{baseUrl}}/api/v1/cart/{{cartId2}}/items",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "cart",
                     "{{cartId2}}",
                     "items"
@@ -6092,12 +6474,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/cart/{{cartId2}}/items",
+              "raw": "{{baseUrl}}/api/v1/cart/{{cartId2}}/items",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "cart",
                 "{{cartId2}}",
                 "items"
@@ -6135,12 +6518,13 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/cart/{{cartId2}}/items",
+                  "raw": "{{baseUrl}}/api/v1/cart/{{cartId2}}/items",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "cart",
                     "{{cartId2}}",
                     "items"
@@ -6172,12 +6556,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/cart/{{fakeId}}/items",
+              "raw": "{{baseUrl}}/api/v1/cart/{{fakeId}}/items",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "cart",
                 "{{fakeId}}",
                 "items"
@@ -6210,12 +6595,13 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/cart/{{fakeId}}/items",
+                  "raw": "{{baseUrl}}/api/v1/cart/{{fakeId}}/items",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "cart",
                     "{{fakeId}}",
                     "items"
@@ -6253,12 +6639,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/orders",
+              "raw": "{{baseUrl}}/api/v1/orders",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "orders"
               ]
             },
@@ -6298,12 +6685,13 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/orders",
+                  "raw": "{{baseUrl}}/api/v1/orders",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "orders"
                   ]
                 },
@@ -6346,12 +6734,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/orders",
+              "raw": "{{baseUrl}}/api/v1/orders",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "orders"
               ]
             },
@@ -6395,12 +6784,13 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/orders",
+                  "raw": "{{baseUrl}}/api/v1/orders",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "orders"
                   ]
                 },
@@ -6443,12 +6833,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/orders",
+              "raw": "{{baseUrl}}/api/v1/orders",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "orders"
               ]
             },
@@ -6492,12 +6883,13 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/orders",
+                  "raw": "{{baseUrl}}/api/v1/orders",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "orders"
                   ]
                 },
@@ -6540,12 +6932,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/orders",
+              "raw": "{{baseUrl}}/api/v1/orders",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "orders"
               ]
             },
@@ -6590,12 +6983,13 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/orders",
+                  "raw": "{{baseUrl}}/api/v1/orders",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "orders"
                   ]
                 },
@@ -6639,12 +7033,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/orders",
+              "raw": "{{baseUrl}}/api/v1/orders",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "orders"
               ]
             },
@@ -6688,12 +7083,13 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/orders",
+                  "raw": "{{baseUrl}}/api/v1/orders",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "orders"
                   ]
                 },
@@ -6736,12 +7132,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/orders",
+              "raw": "{{baseUrl}}/api/v1/orders",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "orders"
               ]
             },
@@ -6812,12 +7209,13 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/orders",
+                  "raw": "{{baseUrl}}/api/v1/orders",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "orders"
                   ]
                 },
@@ -6852,12 +7250,13 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/products/{{productId}}",
+              "raw": "{{baseUrl}}/api/v1/products/{{productId}}",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "products",
                 "{{productId}}"
               ]
@@ -6886,12 +7285,13 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "{{baseUrl}}/api/products/{{productId}}",
+                  "raw": "{{baseUrl}}/api/v1/products/{{productId}}",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "products",
                     "{{productId}}"
                   ]
@@ -6926,12 +7326,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/orders",
+              "raw": "{{baseUrl}}/api/v1/orders",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "orders"
               ]
             },
@@ -6975,12 +7376,13 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/orders",
+                  "raw": "{{baseUrl}}/api/v1/orders",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "orders"
                   ]
                 },
@@ -7019,12 +7421,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/orders",
+              "raw": "{{baseUrl}}/api/v1/orders",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "orders"
               ]
             }
@@ -7058,12 +7461,13 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/orders",
+                  "raw": "{{baseUrl}}/api/v1/orders",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "orders"
                   ]
                 }
@@ -7093,12 +7497,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/orders",
+              "raw": "{{baseUrl}}/api/v1/orders",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "orders"
               ]
             }
@@ -7135,12 +7540,13 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/orders",
+                  "raw": "{{baseUrl}}/api/v1/orders",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "orders"
                   ]
                 }
@@ -7170,12 +7576,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/orders/{{orderId}}",
+              "raw": "{{baseUrl}}/api/v1/orders/{{orderId}}",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "orders",
                 "{{orderId}}"
               ]
@@ -7207,12 +7614,13 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/orders/{{orderId}}",
+                  "raw": "{{baseUrl}}/api/v1/orders/{{orderId}}",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "orders",
                     "{{orderId}}"
                   ]
@@ -7243,12 +7651,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/orders/{{fakeId}}",
+              "raw": "{{baseUrl}}/api/v1/orders/{{fakeId}}",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "orders",
                 "{{fakeId}}"
               ]
@@ -7280,12 +7689,13 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/orders/{{fakeId}}",
+                  "raw": "{{baseUrl}}/api/v1/orders/{{fakeId}}",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "orders",
                     "{{fakeId}}"
                   ]
@@ -7316,12 +7726,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/orders/{{orderId}}",
+              "raw": "{{baseUrl}}/api/v1/orders/{{orderId}}",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "orders",
                 "{{orderId}}"
               ]
@@ -7353,12 +7764,13 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/orders/{{orderId}}",
+                  "raw": "{{baseUrl}}/api/v1/orders/{{orderId}}",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "orders",
                     "{{orderId}}"
                   ]
@@ -7389,12 +7801,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/orders/{{orderId}}",
+              "raw": "{{baseUrl}}/api/v1/orders/{{orderId}}",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "orders",
                 "{{orderId}}"
               ]
@@ -7426,12 +7839,13 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/orders/{{orderId}}",
+                  "raw": "{{baseUrl}}/api/v1/orders/{{orderId}}",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "orders",
                     "{{orderId}}"
                   ]
@@ -7466,12 +7880,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/orders/{{orderId}}/status",
+              "raw": "{{baseUrl}}/api/v1/orders/{{orderId}}/status",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "orders",
                 "{{orderId}}",
                 "status"
@@ -7521,12 +7936,13 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/orders/{{orderId}}/status",
+                  "raw": "{{baseUrl}}/api/v1/orders/{{orderId}}/status",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "orders",
                     "{{orderId}}",
                     "status"
@@ -7571,12 +7987,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/orders/{{orderId}}/status",
+              "raw": "{{baseUrl}}/api/v1/orders/{{orderId}}/status",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "orders",
                 "{{orderId}}",
                 "status"
@@ -7622,12 +8039,13 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/orders/{{orderId}}/status",
+                  "raw": "{{baseUrl}}/api/v1/orders/{{orderId}}/status",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "orders",
                     "{{orderId}}",
                     "status"
@@ -7672,12 +8090,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/orders/{{orderId}}/status",
+              "raw": "{{baseUrl}}/api/v1/orders/{{orderId}}/status",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "orders",
                 "{{orderId}}",
                 "status"
@@ -7723,12 +8142,13 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/orders/{{orderId}}/status",
+                  "raw": "{{baseUrl}}/api/v1/orders/{{orderId}}/status",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "orders",
                     "{{orderId}}",
                     "status"
@@ -7773,12 +8193,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/orders/{{fakeId}}/status",
+              "raw": "{{baseUrl}}/api/v1/orders/{{fakeId}}/status",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "orders",
                 "{{fakeId}}",
                 "status"
@@ -7824,12 +8245,13 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/orders/{{fakeId}}/status",
+                  "raw": "{{baseUrl}}/api/v1/orders/{{fakeId}}/status",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "orders",
                     "{{fakeId}}",
                     "status"
@@ -7870,12 +8292,13 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/this-route-does-not-exist",
+              "raw": "{{baseUrl}}/api/v1/this-route-does-not-exist",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "this-route-does-not-exist"
               ]
             }
@@ -7905,12 +8328,13 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "{{baseUrl}}/api/this-route-does-not-exist",
+                  "raw": "{{baseUrl}}/api/v1/this-route-does-not-exist",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "this-route-does-not-exist"
                   ]
                 }
@@ -7946,12 +8370,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/categories/{{categoryId}}",
+              "raw": "{{baseUrl}}/api/v1/categories/{{categoryId}}",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "categories",
                 "{{categoryId}}"
               ]
@@ -7983,12 +8408,13 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/categories/{{categoryId}}",
+                  "raw": "{{baseUrl}}/api/v1/categories/{{categoryId}}",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "categories",
                     "{{categoryId}}"
                   ]
@@ -8019,12 +8445,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/products/{{productId}}",
+              "raw": "{{baseUrl}}/api/v1/products/{{productId}}",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "products",
                 "{{productId}}"
               ]
@@ -8056,12 +8483,13 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/products/{{productId}}",
+                  "raw": "{{baseUrl}}/api/v1/products/{{productId}}",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "products",
                     "{{productId}}"
                   ]
@@ -8092,12 +8520,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/products/{{productId2}}",
+              "raw": "{{baseUrl}}/api/v1/products/{{productId2}}",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "products",
                 "{{productId2}}"
               ]
@@ -8129,12 +8558,13 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/products/{{productId2}}",
+                  "raw": "{{baseUrl}}/api/v1/products/{{productId2}}",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "products",
                     "{{productId2}}"
                   ]
@@ -8165,12 +8595,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/products/{{fakeId}}",
+              "raw": "{{baseUrl}}/api/v1/products/{{fakeId}}",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "products",
                 "{{fakeId}}"
               ]
@@ -8202,12 +8633,13 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/products/{{fakeId}}",
+                  "raw": "{{baseUrl}}/api/v1/products/{{fakeId}}",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "products",
                     "{{fakeId}}"
                   ]
@@ -8238,12 +8670,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/categories/{{categoryId}}",
+              "raw": "{{baseUrl}}/api/v1/categories/{{categoryId}}",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "categories",
                 "{{categoryId}}"
               ]
@@ -8275,12 +8708,13 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/categories/{{categoryId}}",
+                  "raw": "{{baseUrl}}/api/v1/categories/{{categoryId}}",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "categories",
                     "{{categoryId}}"
                   ]
@@ -8311,12 +8745,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/categories/{{categoryId2}}",
+              "raw": "{{baseUrl}}/api/v1/categories/{{categoryId2}}",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "categories",
                 "{{categoryId2}}"
               ]
@@ -8348,12 +8783,13 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/categories/{{categoryId2}}",
+                  "raw": "{{baseUrl}}/api/v1/categories/{{categoryId2}}",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "categories",
                     "{{categoryId2}}"
                   ]
@@ -8384,12 +8820,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/categories/{{fakeId}}",
+              "raw": "{{baseUrl}}/api/v1/categories/{{fakeId}}",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
+                "v1",
                 "categories",
                 "{{fakeId}}"
               ]
@@ -8421,12 +8858,13 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/categories/{{fakeId}}",
+                  "raw": "{{baseUrl}}/api/v1/categories/{{fakeId}}",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "api",
+                    "v1",
                     "categories",
                     "{{fakeId}}"
                   ]

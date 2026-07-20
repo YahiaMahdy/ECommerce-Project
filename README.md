@@ -63,23 +63,23 @@ A full-featured RESTful API for an e-commerce platform built with Node.js and Ex
 │   ├── order.controller.js    # Checkout / order processing
 │   └── cart.controller.js     # Cart operations
 ├── routes/
-│   ├── auth.routes.js
-│   ├── category.routes.js
-│   ├── products.routes.js
-│   ├── orders.routes.js
-│   └── cart.routes.js
+│   └── v1/
+│       ├── auth.routes.js
+│       ├── category.routes.js
+│       ├── products.routes.js
+│       ├── orders.routes.js
+│       └── cart.routes.js
 ├── middleware/
 │   ├── auth.js                # `protect` - verifies the JWT, loads req.user
 │   ├── role.js                # `restrictTo(...roles)` / `adminOnly`
-│   ├── rateLimiter.js         # Login rate limiter (10 req / 15 min per IP)
+│   ├── rateLimiter.js         # authLimiter (10/15min, /api/v1/auth) + generalLimiter (100/15min, everything)
 │   ├── errorHandler.js        # Global error handling
 │   └── asyncHandler.js        # Async error wrapper
 ├── utils/
 │   ├── AppError.js            # Custom error class
 │   └── generateToken.js       # Signs a JWT for a given user id
 └── postman/
-    ├── ECommerce-Project.postman_collection.json
-    └── E-Commerce API Dev.postman_environment.json
+    └── collection.json        # Self-contained - baseUrl/categoryId/productId/orderId live as collection variables
 ```
 
 ## Installation
@@ -129,6 +129,7 @@ JWT_EXPIRES_IN=1h
 | `MONGO_URI` | **Yes** | - | App throws at boot if missing |
 | `JWT_SECRET` | **Yes** | - | App throws at boot if missing |
 | `JWT_EXPIRES_IN` | No | `1h` | Any [`ms`](https://github.com/vercel/ms)-style string, e.g. `1h`, `7d` |
+| `VERSION` | No | - | Present in `.env.example` but not currently read by `config/config.js` - API versioning is hardcoded as `/api/v1` in `app.js` instead |
 
 ## Running the Project
 
@@ -161,14 +162,18 @@ This clears `Orders`, `Cart`, `Product`, `Category`, and `User` collections, the
 
 ## Authentication & Authorization
 
-- `POST /api/auth/register` and `POST /api/auth/login` are public. Both return `{ token, user }` on success.
+- The whole API is versioned under `/api/v1` (e.g. `/api/v1/products`, `/api/v1/auth/login`).
+- `POST /api/v1/auth/register` and `POST /api/v1/auth/login` are public. Both return `{ token, user }` on success.
 - Every other route family requires `Authorization: Bearer <token>` **except** `GET` on Categories and Products, which are public.
 - `role` is never accepted from the request body on register - all self-registered accounts are `customer`. The only `admin` account comes from `seed.js`.
 - Two authorization layers are used:
   - **`protect`** (`middleware/auth.js`): verifies the JWT, loads the user, attaches `req.user`. Returns `401` if the token is missing, invalid, expired, or the user no longer exists.
   - **`adminOnly`** (`middleware/role.js`): requires `req.user.role === 'admin'`. Returns `403` otherwise.
 - **Ownership checks** (done inside the controllers, not middleware): a `customer` can only read/modify their own carts and orders; an `admin` can access any of them. Attempting to touch another user's cart/order returns `403`.
-- `POST /api/auth/login` is rate-limited to **10 requests per 15 minutes per IP**; exceeding it returns `429`.
+- **Two rate limiters** (`middleware/rateLimiter.js`):
+  - `generalLimiter` - 100 requests / 15 minutes per IP, applied to **every** route.
+  - `authLimiter` - 10 requests / 15 minutes per IP, applied in front of the whole `/api/v1/auth` router - so it now covers `register` as well as `login`, not just `login`.
+  - Both return `429` with a `{ status, message }` body when tripped; `authLimiter`'s body also includes `statusCode: 429`, `generalLimiter`'s currently doesn't (minor inconsistency between the two).
 
 | Resource | Public | Any logged-in user | Admin only |
 |---|---|---|---|
@@ -183,37 +188,42 @@ This clears `Orders`, `Cart`, `Product`, `Category`, and `User` collections, the
 
 | Method | Path | Body | Notes |
 |---|---|---|---|
-| POST | `/api/auth/register` | `name, email, password, address` | `password` min 8 chars; always creates a `customer` |
-| POST | `/api/auth/login` | `email, password` | Rate-limited (10/15min/IP) |
+| POST | `/api/v1/auth/register` | `name, email, password, address` | `password` min 8 chars; always creates a `customer`; shares the authLimiter bucket below |
+| POST | `/api/v1/auth/login` | `email, password` | Rate-limited (10/15min/IP, shared with `/register`) |
 
 ### Categories
 
 | Method | Path | Auth | Notes |
 |---|---|---|---|
-| GET | `/api/categories` | Public | List all |
-| GET | `/api/categories/:id` | Public | 404 if missing |
-| POST | `/api/categories` | Admin | `name` required (unique) |
-| PATCH | `/api/categories/:id` | Admin | Partial update |
-| DELETE | `/api/categories/:id` | Admin | 400 if any product still references it |
+| GET | `/api/v1/categories` | Public | List all |
+| GET | `/api/v1/categories/:id` | Public | 404 if missing |
+| POST | `/api/v1/categories` | Admin | `name` required (unique) |
+| PATCH | `/api/v1/categories/:id` | Admin | Partial update |
+| DELETE | `/api/v1/categories/:id` | Admin | 400 if any product still references it |
 
 ### Products
 
 | Method | Path | Auth | Notes |
 |---|---|---|---|
-| GET | `/api/products` | Public | Query filters below |
-| GET | `/api/products/:id` | Public | `category` populated with `name, description` |
-| POST | `/api/products` | Admin | Validates `category` exists (404 if not); `name, category, price, stock` required |
-| PUT | `/api/products/:id` | Admin | **Full replace** from `name, category, price, stock` only - see [Known Implementation Notes](#known-implementation-notes) |
-| PATCH | `/api/products/:id` | Admin | Partial update |
-| DELETE | `/api/products/:id` | Admin | |
+| GET | `/api/v1/products` | Public | Paginated - see below |
+| GET | `/api/v1/products/:id` | Public | `category` populated with `name, description` |
+| POST | `/api/v1/products` | Admin | Validates `category` exists (404 if not); `name, category, price, stock` required |
+| PUT | `/api/v1/products/:id` | Admin | **Full replace** from `name, category, price, stock` only - see [Known Implementation Notes](#known-implementation-notes) |
+| PATCH | `/api/v1/products/:id` | Admin | Partial update |
+| DELETE | `/api/v1/products/:id` | Admin | |
 
-`GET /api/products` query filters (combinable):
+`GET /api/v1/products` returns `data: { products: [...], pagination: { total, page, limit, totalPages } }` - **not** a bare array. It does **not** populate `category` (raw id only); only `GET /:id` does.
+
+Query params (combinable):
 
 | Param | Example | Behavior |
 |---|---|---|
+| `page` / `limit` | `?page=2&limit=20` | `limit` capped at 50, defaults: `page=1`, `limit=10` |
+| `sortBy` / `order` | `?sortBy=price&order=asc` | `sortBy` one of `price, name, createdAt, stock` (default `createdAt`); `order` `asc`/`desc` (default `desc`); anything else silently falls back to the default rather than erroring |
+| `fields` | `?fields=name,price` | Whitelist projection - only `name, category, price, stock, inStock` are selectable; unrecognized names are dropped, and an entirely-invalid list falls back to returning every field except `__v` |
 | `category` | `?category=<id>` | Exact category match |
 | `minPrice` / `maxPrice` | `?minPrice=100&maxPrice=500` | `price` range (inclusive) |
-| `inStock` | `?inStock=true` | `true` → `stock > 0`, anything else → `stock <= 0` |
+| `inStock` | `?inStock=true` | Filters on the stored `inStock` boolean directly (`true`/anything else) - **not** derived from live `stock`; nothing in the codebase keeps it in sync with `stock` changes, so it can drift over time |
 | `search` | `?search=laptop` | Case-insensitive match on `name` |
 
 ### Cart
@@ -222,14 +232,14 @@ All routes require a Bearer token. A customer only sees/modifies their own carts
 
 | Method | Path | Notes |
 |---|---|---|
-| GET | `/api/cart` | Own carts (all carts if admin) |
-| GET | `/api/cart/:id` | 403 if not yours |
-| POST | `/api/cart` | Creates an empty (or pre-seeded) cart tied to the logged-in user - no `customerName` needed, it's taken from the token |
-| POST | `/api/cart/:id/items` | `{ productId, quantity }` - validates stock, increments quantity if already present |
-| PATCH | `/api/cart/:id/items/:productId` | `{ quantity }` - re-validates stock |
-| DELETE | `/api/cart/:id/items/:productId` | Removes one line item |
-| DELETE | `/api/cart/:id/items` | Clears the whole cart (items → `[]`, `totalPrice` → `0`) |
-| PATCH | `/api/cart/:id/status` | `{ status }` - must be one of the enum values |
+| GET | `/api/v1/cart` | Own carts (all carts if admin) |
+| GET | `/api/v1/cart/:id` | 403 if not yours |
+| POST | `/api/v1/cart` | Creates an empty (or pre-seeded) cart tied to the logged-in user - no `customerName` needed, it's taken from the token |
+| POST | `/api/v1/cart/:id/items` | `{ productId, quantity }` - validates stock, increments quantity if already present |
+| PATCH | `/api/v1/cart/:id/items/:productId` | `{ quantity }` - re-validates stock |
+| DELETE | `/api/v1/cart/:id/items/:productId` | Removes one line item |
+| DELETE | `/api/v1/cart/:id/items` | Clears the whole cart (items → `[]`, `totalPrice` → `0`) |
+| PATCH | `/api/v1/cart/:id/status` | `{ status }` - must be one of the enum values |
 
 ### Orders & Checkout
 
@@ -237,12 +247,12 @@ All routes require a Bearer token.
 
 | Method | Path | Auth | Notes |
 |---|---|---|---|
-| GET | `/api/orders` | Any user | Own orders (all orders if admin) |
-| GET | `/api/orders/:id` | Any user | 403 if not yours (unless admin) |
-| POST | `/api/orders` | Any user | The checkout endpoint - see below |
-| PATCH | `/api/orders/:id/status` | Admin | Validates against the status enum |
+| GET | `/api/v1/orders` | Any user | Own orders (all orders if admin) |
+| GET | `/api/v1/orders/:id` | Any user | 403 if not yours (unless admin) |
+| POST | `/api/v1/orders` | Any user | The checkout endpoint - see below |
+| PATCH | `/api/v1/orders/:id/status` | Admin | Validates against the status enum |
 
-`POST /api/orders` body: `{ cartId, shippingAddress? }`
+`POST /api/v1/orders` body: `{ cartId, shippingAddress? }`
 
 - `cartId` is required (400 if missing); `shippingAddress` is **optional** - if omitted, it falls back to the logged-in user's registered `address`.
 - Looks up the cart (404 if missing, 403 if it belongs to someone else and you're not an admin, 400 if empty, 400 if not `active`).
@@ -252,7 +262,7 @@ All routes require a Bearer token.
 - Creates the `Order` with an auto-generated `orderNumber` (`ORD-YYYYMMDD-####`) and `status: 'pending'`.
 - Clears the cart (`items: []`, `totalPrice: 0`) and marks it `checked_out`.
 
-There is no separate "checkout a cart" endpoint - `POST /api/orders` **is** the checkout flow.
+There is no separate "checkout a cart" endpoint - `POST /api/v1/orders` **is** the checkout flow.
 
 ## Data Models
 
@@ -357,40 +367,30 @@ Every error response (from `middleware/errorHandler.js`) has the same shape:
 | Duplicate key (`code 11000`) | 409 | `<field> already exists` |
 | `JsonWebTokenError` (malformed/invalid token) | 401 | `Invalid token` |
 | `TokenExpiredError` | 401 | `Token has expired` |
-| Rate limit exceeded | 429 | `Too many login attempts. Please try again in 15 minutes.` |
+| Rate limit exceeded | 429 | `Too many login attempts. Please try again in 15 minutes.` (authLimiter) or `Too many requests, please try again later.` (generalLimiter) |
 | Unmatched route | 404 | `Can't find <method + path>` |
 | Anything unexpected | 500 | `Internal Server Error` |
 
 ## Postman Documentation
 
-The `postman/` folder contains a full request collection plus its companion environment, both exported for GitHub:
+`postman/collection.json` is a single self-contained request collection covering every endpoint in the API (Auth, Categories, Products, Cart, Orders, plus a 404 sanity check), organized into folders that run top-to-bottom as an actual integration test:
 
-- **`ECommerce-Project.postman_collection.json`** - every endpoint in the API (Auth, Categories, Products, Cart, Orders, plus a 404 sanity check), organized into folders that run top-to-bottom as an actual integration test:
-  - Each `POST`/`PATCH` request has its JSON body included directly in the request.
-  - Each request has a `pm.test()` script asserting the expected status code (and, for most, response shape).
-  - Each request has one saved example response (visible in Postman's "Examples" panel) covering both the success path and the specific error branch that request targets - missing/invalid input, `401` (no token), `403` (wrong role or wrong owner), `404`, `409`, and rate-limit `429`.
-  - IDs and tokens produced by early requests (e.g. `adminToken`, `customerToken`, `cartId`) are captured into collection variables by test scripts and reused by later requests, so the whole collection can be run via **Collection Runner** in one pass.
-- **`E-Commerce API Dev.postman_environment.json`** - the environment required by the project checklist, holding `baseUrl`, `categoryId`, `productId`, and `orderId`. Every request in the collection reads `{{baseUrl}}` from it rather than a hardcoded host, and the first category/product/order creation requests write their real IDs back into this environment as the collection runs.
+- Each `POST`/`PATCH` request has its JSON body included directly in the request.
+- Each request has a `pm.test()` script asserting the expected status code (and, for most, response shape).
+- Each request has one saved example response (visible in Postman's "Examples" panel) covering both the success path and the specific error branch that request targets - missing/invalid input, `401` (no token), `403` (wrong role or wrong owner), `404`, `409`, and rate-limit `429`.
+- `baseUrl`, `categoryId`, `productId`, and `orderId` live as **collection variables** (Collection → Variables tab) - no separate environment file is needed. IDs/tokens produced by early requests (e.g. `adminToken`, `customerToken`, `cartId`) are captured into collection variables by test scripts and reused by later requests, so the whole collection can be run via **Collection Runner** in one pass.
 
 ### To use it
 
-1. In Postman: **Import** both files (`File > Import`, or drag them in).
-2. Select the **"E-Commerce API Dev"** environment from the environment dropdown (top right).
-3. If your server isn't on `http://localhost:3000`, update `baseUrl` in that environment.
-4. Run `npm run seed` against the database your server is pointed at, so the seeded admin account exists.
-5. Run the collection top-to-bottom (Collection Runner, or just click through folders in order: **Auth → Categories → Products → Cart → Orders & Checkout → Misc → Cleanup**) - later requests depend on tokens/IDs captured by earlier ones.
+1. In Postman: **Import** `postman/collection.json` (`File > Import`, or drag it in).
+2. If your server isn't on `http://localhost:3000`, edit `baseUrl` under the collection's **Variables** tab.
+3. Run `npm run seed` so the seeded admin account exists.
+4. Run the collection top-to-bottom (Collection Runner, or just click through folders in order: **Auth → Categories → Products → Cart → Orders & Checkout → Misc → Cleanup**) - later requests depend on tokens/IDs captured by earlier ones.
 
 A couple of things worth knowing before you run it:
-- `/api/auth/login` is rate-limited (10/15min/IP); the collection only calls it 5 times per run, but running the *entire* collection more than ~twice within 15 minutes can trip that limit - that's the API working as designed, not a bug in the collection.
+- `/api/v1/auth` (register + login share one bucket) is rate-limited (10/15min/IP); the collection uses ~6 of those 10 per run, so running the *entire* collection more than ~twice within 15 minutes can trip it on later Auth requests - that's the API working as designed, not a bug in the collection.
 - Categories/products created by the collection are timestamped in their names (`{{$timestamp}}`) specifically so re-running the whole collection from the top doesn't collide with the unique-name indexes on those two models.
-- The saved response examples are accurate reconstructions based on reading the current source code (this sandbox has no route to a live MongoDB instance to capture literal responses from). If you want byte-exact captures for a grading checklist, run the collection once against your dev server and use Postman's **"Save Response → Save as Example"** to overwrite any of them.
-
-## Known Implementation Notes
-
-Found while building the documentation above - flagged here rather than silently "fixed", since it's your call whether/how to address them:
-
-- **`PUT /api/products/:id` doesn't behave like a typical full replace.** The controller calls `Product.findByIdAndUpdate(id, { name, category, price, stock }, ...)` with no `$set`. MongoDB treats an update object with no operators as a **full document replacement**, so `images`, `description`, and `inStock` - which aren't in that object - aren't carried over by this route. This looks like it predates the `images` field being added. `PATCH` is unaffected and is the safe choice for partial updates.
-- **`images` is marked `required` on `Product` but isn't effectively enforced.** Mongoose's `required` check on an Array path only verifies the array itself is set, and Mongoose auto-defaults unset array paths to `[]` - so creating a product with no `images` field currently succeeds with `images: []` rather than returning a 400.
+- The saved response examples are accurate reconstructions based on reading the current source code (no route to a live MongoDB instance was available to capture literal responses from while building this). If you want byte-exact captures for a grading checklist, run the collection once against your dev server and use Postman's **"Save Response → Save as Example"** to overwrite any of them.
 
 ## Development
 
@@ -407,7 +407,7 @@ npm run seed          # Seed the database with sample categories/products/users
 - Input validation on all endpoints, with centralized error formatting
 - Consistent `{ status, message, data }` success envelope
 - JWT auth + role-based + ownership-based authorization
-- Rate limiting on the auth endpoint most worth protecting (login)
+- Two-tier rate limiting: a general limiter on every route plus a stricter one on the auth endpoints most worth protecting (register/login)
 - Async/await throughout, wrapped in a shared `asyncHandler` so no route needs its own try/catch
 - Environment-based configuration with fail-fast checks for required secrets
 

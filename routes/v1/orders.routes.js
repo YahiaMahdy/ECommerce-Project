@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
 
-const orderController = require('../controllers/order.controller');
-const protect = require('../middleware/auth');
-const { adminOnly } = require('../middleware/role');
+const orderController = require('../../controllers/order.controller');
+const protect = require('../../middleware/auth');
+const { adminOnly } = require('../../middleware/role');
 
 router.use(protect);
 
